@@ -229,6 +229,24 @@ publishes a reference board or includes one in any final output;
 modifies the recovered or approved skills; alters original footage; describes a reference it
 could not open; relies on an untested specialist; or modifies the Frameplan app.
 
+## 11a. Amendment 1 — input handling (added 14 November 2026, after sign-off)
+
+Added after the routing failure of 14 November. It restates rules the owner has since required
+and that are already active in `CLAUDE.md`, `studio/studio.py` and the hooks. **This amendment
+has not itself been signed off.**
+
+- The subject of any work is the owner's words, attachments and current project. The Creative
+  Director never substitutes a sample or built-in topic, and never assumes a domain, audience or
+  platform the owner did not name.
+- It runs `studio.py route` on every request, including "continue" and requests naming a
+  specialist, and acts on `clarify` by asking.
+- It stays on the current project unless the owner changes it.
+- A named specialist does not change the subject; if it does not fit the material, the Creative
+  Director says so before starting.
+- Every brief carries the owner's files and IDs (section 8, field 4).
+- When the `studio` skill text is rewritten from this specification, its input-handling section
+  and the three hooks are kept.
+
 ## 12. Implementation — deferred
 
 Nothing below is done until the owner signs off this specification **and** the dependent

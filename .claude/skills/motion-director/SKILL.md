@@ -1,6 +1,6 @@
 ---
 name: motion-director
-description: Turn a short title or topic into a researched motion-graphics story, obtain IDEA approval first, present visual STYLE choices only after the idea is approved, then create the production prompt and optionally render using Remotion, HyperFrames, or an available connected tool. Use for explainers, HSE/WHS education, LinkedIn videos, launches, data visualizations, logo animations, and social reels.
+description: Turn a short title or topic into a researched motion-graphics story, obtain IDEA approval first, present visual STYLE choices only after the idea is approved, then create the production prompt and optionally render using Remotion, HyperFrames, or an available connected tool. Use for motion-graphics explainers, launches, data visualizations, logo animations and social videos on any subject the user supplies.
 argument-hint: "<video title or topic>"
 ---
 
@@ -10,9 +10,10 @@ The user should need to supply **only a title**. Act as research editor, scriptw
 
 ## Defaults
 
-- Audience: curious working professionals; for WHS/HSE subjects, Australian safety leaders and frontline workers.
-- Distribution: LinkedIn first. Vertical 1080x1920, 9:16, 30 fps, 25–40 seconds. If a technical explainer is dense, recommend 45–60 seconds or a 16:9 version. Ask only for choices that materially change the result.
-- Tone: evidence-led, practical, insightful, accessible, respectful; avoid scare tactics and compliance clichés.
+- Subject: only the title or topic the user supplies, together with any attachments and the active project. There is no default subject. If none was supplied, ask for one; never invent one or reuse an example.
+- Audience: infer it from the user's title and context and state the inference; if it is unclear and would change the result, ask. There is no default audience or domain.
+- Distribution: use the platform the user names (`platform=`) or the active project's platform. There is no default platform; if none is given and it matters, ask. Default technical format when the user does not mind: vertical 1080x1920, 9:16, 30 fps, 25–40 seconds. If a technical explainer is dense, recommend 45–60 seconds or a 16:9 version. Ask only for choices that materially change the result.
+- Tone: evidence-led, practical, insightful, accessible, respectful; avoid scare tactics and clichés.
 - Style: premium typography, a cohesive 2–3-color palette, deliberate whitespace, clear hierarchy, legible mobile-safe captions. Choose typography available/licensable in the environment.
 - Visual narrative: one recurring visual motif; transitions should explain or connect concepts. Do not force morphs where a clean cut would communicate better.
 - Two separate editorial gates, in strict order: **IDEA APPROVAL**, then **STYLE APPROVAL**. Never show, recommend, shortlist, or ask the user to select a visual style before idea approval. Never start rendering, paid API jobs, publishing, or irreversible actions without appropriate execution approval.
@@ -21,14 +22,14 @@ The user should need to supply **only a title**. Act as research editor, scriptw
 
 ## Invocation and controls
 
-Input: `$ARGUMENTS`, commonly one title, e.g. `/motion-director Why forklift and pedestrian segregation matters`.
-Optional user shorthand: `platform=linkedin`, `duration=30`, `format=9:16`, `engine=remotion|hyperframes|auto`, `mode=concept|prompt|render`.
+Input: `$ARGUMENTS`, commonly one title: `/motion-director <the user's title>`. If it is empty, ask the user for a title and stop.
+Optional user shorthand: `platform=<name>`, `duration=30`, `format=9:16`, `engine=remotion|hyperframes|auto`, `mode=concept|prompt|render`.
 If mode is not specified, stop at **IDEA APPROVAL**. Interpret "approve" according to the active stage: approving the idea advances only to style selection; approving the style advances to master prompt preparation. Never interpret a single approval as approval of both.
 
 ## Phase 1 — Research & editorial judgement
 
 1. Infer purpose, audience, single takeaway, desired viewer behavior, and content sensitivity from the title. Identify the knowledge gap and the best human hook.
-2. Search trustworthy, recent primary sources, especially for time-sensitive or consequential claims. For Australian WHS: relevant state regulator, Safe Work Australia, legislation, codes, incident reports, and official guidance. Use current browsing tools when available. If browsing is unavailable, disclose this and distinguish enduring principles from facts needing verification.
+2. Search trustworthy, recent primary sources, especially for time-sensitive or consequential claims. Match the sources to the subject's own field and jurisdiction: where it is regulated, the relevant regulator, legislation, codes, standards and official guidance; otherwise original research, primary documents and first-hand creators. Use current browsing tools when available. If browsing is unavailable, disclose this and distinguish enduring principles from facts needing verification.
 3. Produce a compact research ledger: claim, source title, URL, publication/access date where known, confidence, and how the claim will be represented on screen. Never present a professional opinion as a legal requirement.
 4. Separate `Verified facts`, `Interpretation/opinion`, and `Creative simplification`. Respect jurisdictional differences. Do not invent numerical risk reductions or dramatize an incident as factual if hypothetical.
 5. Write a single-sentence editorial thesis, a strong 0–3 second hook, three or fewer content beats, and a clear takeaway/CTA. Avoid jargon unless defined.
@@ -97,12 +98,12 @@ Choose styles based on semantic fit, not novelty. Blend at most two primary styl
 | Style | Good fit |
 | --- | --- |
 | Kinetic typography | memorable assertions, culture, leadership, quotations |
-| Isometric | logistics, warehouse flows, pedestrian–vehicle systems |
-| Technical blueprint | LOTO, machine guarding, control mechanisms |
+| Isometric | logistics, spatial flows, systems with moving parts |
+| Technical blueprint | mechanisms, engineering controls, how-it-works breakdowns |
 | Wireframe 3D | component-level equipment explanations |
 | Bauhaus / geometric data | verified charts and statistics |
 | Split-flap | count-up or headline figures |
-| Infographic / editorial | nuanced HSE, legal, workplace topics |
+| Infographic / editorial | nuanced policy, legal and workplace topics |
 | Liquid morph | transformations, product concepts |
 | Particles | logo/reveal/abstract topics |
 | Holographic | technology/product reveals |
@@ -120,3 +121,6 @@ Choose styles based on semantic fit, not novelty. Blend at most two primary styl
 ## Final response when production completes
 
 Give a clickable path to verified outputs, report actual duration and audio status based on probes, identify sources and engine used, list substantive QA fixes, and distinguish outstanding gaps from completed work. If user wants weekly publication, hand off approved final assets to a separate scheduling/publishing workflow; never auto-post on title alone.
+
+## Change note
+On 14 Nov 2026, on the owner's instruction, the built-in example title and the default audience, domain and platform were removed, and three style-fit descriptions were reworded to drop domain examples. The phases, both approval gates, the three-preview rule, the production brief and the 20 styles are unchanged. The original text is in `archive/recovery-pack-2026-11-13/`.

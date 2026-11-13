@@ -1,7 +1,7 @@
 # Test results
 
-Run on 13 November 2026 with `python3 -m unittest discover -s tests -v`
-(Python 3.13, SQLite 3.53). **101 tests, 101 passed.**
+Run on 14 November 2026 with `python3 -m unittest discover -s tests -v`
+(Python 3.13, SQLite 3.53). **140 tests, 140 passed.**
 
 These tests cover the database tool, the workflow gates, the paid-generation hook script, the
 merged skills, the video breakdown script (on a synthetic clip built by ffmpeg), the agent
@@ -13,7 +13,7 @@ keeps IDs, URLs, creator, access status, certainty labels and analysis history, 
 duplicate links into one record; the 15-column manifest round-trips the owner's template exactly.
 
 Agent 00 was also run once on its own; that is a behavioural test, logged separately in
-`docs/tests/AGENT00_TEST_2026-11-13.md`, and is not part of the 101.
+`docs/tests/AGENT00_TEST_2026-11-13.md`, and is not part of the 140.
 
 They do not cover: any subagent actually running, analysis of real footage or real references,
 any live generation, or the hook firing inside a live session.
@@ -76,6 +76,7 @@ test_archive_still_matches_the_packs_own_checksums [TestVerbatimInstall] ... ok
 test_catalog_tool_original_is_preserved_and_the_change_is_declared [TestVerbatimInstall] ... ok
 test_installed_files_are_byte_identical_to_the_recovered_originals [TestVerbatimInstall] ... ok
 test_motion_director_gate_order_is_intact [TestVerbatimInstall] ... ok
+test_motion_director_keeps_its_method_after_the_topic_removal [TestVerbatimInstall] ... ok
 test_recovered_skills_have_their_original_names [TestVerbatimInstall] ... ok
 test_v04_editing_skills_were_not_replaced_by_the_older_drafts [TestVerbatimInstall] ... ok
 test_agents_have_no_generation_or_approval_powers [TestAgentDefinitions] ... ok
@@ -101,6 +102,35 @@ test_missing_or_unreadable_file_fails_cleanly [TestVideoProbe] ... ok
 test_refuses_to_write_into_a_non_empty_folder [TestVideoProbe] ... ok
 test_shot_list_uses_the_owners_manifest_columns_and_invents_nothing [TestVideoProbe] ... ok
 test_source_video_is_untouched [TestVideoProbe] ... ok
+test_brief_with_project_reference_file_or_link_is_allowed [TestBriefGate] ... ok
+test_hooks_are_registered [TestBriefGate] ... ok
+test_other_agents_and_tools_are_not_affected [TestBriefGate] ... ok
+test_studio_specialists_cannot_start_without_the_owners_input [TestBriefGate] ... ok
+test_subject_driven_skills_need_the_owners_subject [TestBriefGate] ... ok
+test_every_message_gets_the_current_project_and_rules [TestContextHook] ... ok
+test_hook_never_blocks_even_when_broken [TestContextHook] ... ok
+test_hook_raises_the_stop_for_the_failure_case [TestContextHook] ... ok
+test_hook_shows_pending_approvals [TestContextHook] ... ok
+test_continue_stays_on_the_current_project [TestEntryPoints] ... ok
+test_continue_with_no_project_asks [TestEntryPoints] ... ok
+test_direct_request_in_words_uses_the_owners_subject [TestEntryPoints] ... ok
+test_empty_input_is_refused [TestEntryPoints] ... ok
+test_link_is_a_reference [TestEntryPoints] ... ok
+test_named_specialist_that_does_not_fit_the_attachment_is_flagged [TestEntryPoints] ... ok
+test_named_specialist_that_fits_the_current_project_continues_it [TestEntryPoints] ... ok
+test_named_specialist_with_no_subject_and_no_project_asks [TestEntryPoints] ... ok
+test_named_specialist_with_the_owners_own_subject_is_allowed [TestEntryPoints] ... ok
+test_new_input_while_a_project_is_current_keeps_it_in_view [TestEntryPoints] ... ok
+test_no_route_ever_names_a_subject_domain_or_platform [TestEntryPoints] ... ok
+test_resumed_project_becomes_current_and_cancelled_one_does_not_linger [TestEntryPoints] ... ok
+'proceed with Motion Director testing' while the candle project is current. ... ok
+test_uploaded_image_without_words [TestEntryPoints] ... ok
+test_uploaded_own_footage_enters_at_the_edit [TestEntryPoints] ... ok
+test_uploaded_video_without_words_asks_what_it_is [TestEntryPoints] ... ok
+test_motion_director_has_no_default_subject_audience_or_platform [TestNoBuiltInTopics] ... ok
+test_no_sample_subject_or_default_domain_in_production_files [TestNoBuiltInTopics] ... ok
+test_sample_data_lives_only_in_test_fixtures [TestNoBuiltInTopics] ... ok
+test_worked_examples_that_remain_are_marked_as_illustration [TestNoBuiltInTopics] ... ok
 test_agent_cannot_approve_without_user_words [TestApprovalGates] ... ok
 test_concept_gate_blocks_until_user_approves [TestApprovalGates] ... ok
 test_decided_approval_cannot_be_changed [TestApprovalGates] ... ok
@@ -109,6 +139,7 @@ test_motion_graphics_sequence_concept_then_style [TestApprovalGates] ... ok
 test_rejection_keeps_the_gate_closed [TestApprovalGates] ... ok
 test_stages_cannot_be_skipped_but_rework_is_allowed [TestApprovalGates] ... ok
 test_assets_dedupe_by_content [TestDocumentsAndResume] ... ok
+test_choosing_one_of_three_concepts_approves_it_and_keeps_the_others_as_rejected [TestDocumentsAndResume] ... ok
 test_documents_are_versioned_and_approved_ones_superseded_not_edited [TestDocumentsAndResume] ... ok
 test_interrupted_project_resumes_from_the_database [TestDocumentsAndResume] ... ok
 test_multiple_creative_variants_coexist [TestDocumentsAndResume] ... ok
@@ -119,6 +150,14 @@ test_ig_skills_no_longer_point_at_the_home_directory [TestExistingSkillsStillWor
 test_ids_are_sequential_and_prefixed [TestFoundation] ... ok
 test_init_is_repeatable_and_creates_all_libraries [TestFoundation] ... ok
 test_snapshot_restores_a_missing_database [TestFoundation] ... ok
+test_attachment_outranks_a_vague_prompt [TestInputRouting] ... ok
+test_explicit_motion_graphics_request_keeps_the_image_as_its_subject [TestInputRouting] ... ok
+test_image_with_no_prompt_goes_to_agent00_as_a_reference [TestInputRouting] ... ok
+test_no_input_is_an_error_not_a_sample_topic [TestInputRouting] ... ok
+test_orchestrator_and_project_rules_forbid_sample_topics [TestInputRouting] ... ok
+test_route_never_proposes_a_domain [TestInputRouting] ... ok
+test_several_images_and_other_extensions_are_recognised [TestInputRouting] ... ok
+test_video_reference_versus_own_footage [TestInputRouting] ... ok
 test_accessible_reference_stores_analysis_with_basis [TestInspirationLibrary] ... ok
 test_genres_grow_from_references_without_duplicates [TestInspirationLibrary] ... ok
 test_ideas_without_links_dedupe_on_title [TestInspirationLibrary] ... ok

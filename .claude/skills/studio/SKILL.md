@@ -18,8 +18,12 @@ python3 studio/studio.py <group> --help       # every group is documented
 The subject of the work is **what the owner supplied**: their words, their attachments, and the
 project they are in the middle of. Nothing else.
 
-1. **List the input first.** Words, attached images, attached videos, links, and any active
-   project (`project list`). Run `python3 studio/studio.py route "<their words>" --attachment <path> …`.
+1. **List the input first.** Words, attached images, attached videos, links, and the current
+   project. Run `python3 studio/studio.py route "<their words>" --attachment <path> …` on every
+   request, including "continue" and requests that name a specialist. It returns one of three
+   actions: `new_work`, `continue_project`, or `clarify`. On `clarify`, stop and ask the owner.
+   A hook also prints the current project and a routing check on each owner message, but it
+   cannot see attachments, so always rerun `route` with them.
 2. **An attached image with little or no text is a visual creative reference.** Send it to
    Agent 00 (`inspiration-intelligence`) for cataloguing and analysis. Check first whether it is
    already catalogued (`tools/inspiration.py add <path>` answers "already exists").
@@ -29,15 +33,18 @@ project they are in the middle of. Nothing else.
 4. **Never substitute a sample.** A skill's built-in example, a placeholder topic or a "typical"
    subject is never used in place of the owner's input — not even for a test. If a specialist
    needs a subject and none was given, use the active project's subject and say so, or ask.
-5. **No domain defaults.** Do not choose WHS/HSE, safety, LinkedIn or any other domain unless the
-   owner asked for it in this request. Motion Director's own defaults assume WHS and LinkedIn:
-   when calling it, always pass the owner's actual subject, `platform=` and the audience.
+5. **No domain defaults.** Do not choose a domain, audience or platform the owner did not name in
+   this request or in the current project. When calling a subject-driven skill such as Motion
+   Director, always pass the owner's actual subject, and `platform=` and the audience if known.
 6. **Carry the attachments through.** Whatever specialist is called receives the owner's files
    and reference IDs in its brief. A specialist that was not given them has not been briefed.
 7. **If an attachment cannot be opened, say so and ask for it again.** Do not continue without it.
 8. **A named specialist does not change the subject.** "Test Motion Director" means test it on the
    owner's material. If that specialist does not fit the material (Motion Director makes motion
    graphics; it does not plan a photo shoot), say so and propose the right one before starting.
+9. **Stay on the current project** unless the owner changes it (`project use` only on their
+   instruction). New input while a project is current: continue it if it plainly belongs, say so
+   if you open a new one, ask if unclear.
 
 ## 1. Start or resume
 
@@ -77,7 +84,7 @@ Where it helps, produce two or three variants (`doc add --variant A|B|C`) and le
 | Generation specs and prompts | `generation-director` subagent; `python3 studio/adapters/kling.py plan` (dry run); skills `ultra-realistic-portrait`, `navratri-photoshoot`, `kling-ai:*` | built; not yet run on a real project |
 | Identity and quality review | `qa-reviewer` subagent | built; not yet run on a real output |
 | Edit | skills `rough-cut` → `colour-grading` → `effects-and-transitions` → `reel-assembly`, with `cinematic-reel-editing` as reference | available (instruction drafts; no editor control) |
-| Motion graphics production | the owner's `motion-director` skill. Let it run its own phases; record its IDEA APPROVAL as `concept` and STYLE APPROVAL as `style`; pass `platform=` and audience when the topic is not WHS/HSE | installed verbatim, untested; Remotion and HyperFrames not verified |
+| Motion graphics production | the owner's `motion-director` skill. Let it run its own phases; record its IDEA APPROVAL as `concept` and STYLE APPROVAL as `style`; always pass the owner's subject, platform and audience | installed; default topic, audience and platform removed 14 Nov 2026; **no valid test yet**; Remotion and HyperFrames not verified |
 | Scripts, captions, planning, audit | skills `ig-reel`, `ig-caption`, `ig-plan`, `ig-audit`, `ig-viral` and the other `ig-*` | available |
 
 Specialists exchange JSON documents defined in `studio/contracts.py`

@@ -1,44 +1,44 @@
 {
-  "reference_id": "REF-000001",
-  "access_status": "reviewed_video",
+  "reference_id": "REF-000000",
+  "access_status": "reviewed_video | reviewed_images | metadata_only | blocked | unreviewed",
   "blocked_reason": "",
-  "creator": "@example",
-  "title": "Optional verified title",
+  "creator": "<handle or name, only if seen in the source; otherwise empty>",
+  "title": "<verified title, optional>",
   "genre": [
-    "fantasy",
-    "cinematic fashion"
+    "<genre>"
   ],
-  "story_summary": "Describe what was actually observed, not assumptions",
+  "story_summary": "<what was actually observed, not assumptions>",
   "techniques": [
     {
-      "name": "slow push-in",
-      "timecode": "00:02-00:05",
-      "evidence": "subject grows larger across sampled frames",
-      "certainty": "observed",
-      "recreation": "tripod slider or carefully stabilised walking movement"
+      "name": "<technique>",
+      "timecode": "<start-end, for video>",
+      "evidence": "<what was seen, in which frame or file>",
+      "certainty": "observed | inferred | suggested | unverified",
+      "recreation": "<how to recreate it>"
     }
   ],
   "shot_candidates": [
     {
-      "label": "portal silhouette reveal",
-      "shot_size": "WS",
-      "body_crop": "full body",
-      "camera_angle": "front",
-      "camera_height": "eye",
-      "composition": "centred portal",
-      "model_movement": "step forward",
-      "camera_movement": "locked",
-      "confidence": "suggested",
-      "start_time": "00:02",
-      "end_time": "00:05",
-      "actual_frame": "shot_01_actual_frame.jpg"
+      "label": "<short label>",
+      "shot_size": "<EWS|WS|MWS|MS|MCU|CU|ECU>",
+      "body_crop": "<exact crop>",
+      "camera_angle": "<angle>",
+      "camera_height": "<height>",
+      "composition": "<composition>",
+      "model_movement": "<movement>",
+      "camera_movement": "<movement or locked>",
+      "confidence": "observed | inferred | suggested | unverified",
+      "start_time": "",
+      "end_time": "",
+      "actual_frame": ""
     }
   ],
-  "difficulty": "medium",
-  "notes": "Record any access limitations, missing audio or uncertain claims",
+  "difficulty": "<easy | medium | hard>",
+  "notes": "<access limitations, missing audio, uncertain claims>",
   "_field_notes": {
+    "_template": "This file shows the shape only. Every <\u2026> is a placeholder: replace it with what was observed in the owner's reference, and never copy a placeholder or an example into an analysis.",
     "blocked_reason": "Required only when access_status is blocked: network_policy | login_required | not_found | removed | rate_limited | other. Leave empty otherwise.",
     "shot_candidates": "start_time, end_time (or timecode 'start-end'), actual_frame, focal_length, recording_settings and sketch are optional and are carried into export-shots. Give times and frames only for media that was actually inspected.",
-    "_changed": "Fields added 13 Nov 2026 with the owner's approval; original in archive/recovery-pack-2026-11-13/."
+    "_changed": "Fields added 13 Nov 2026 and sample content replaced with placeholders 14 Nov 2026, both on the owner's instruction; original in archive/recovery-pack-2026-11-13/."
   }
 }

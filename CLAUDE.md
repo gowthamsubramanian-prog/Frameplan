@@ -38,6 +38,8 @@ is waiting on the owner. Do not describe anything as working unless that file or
 5. **Do not redesign the owner's components.** Motion Director, Cinematic Reel Storyboard and
    Agent 00 (Inspiration Intelligence) are installed exactly as recovered; the originals are in
    `archive/recovery-pack-2026-11-13/` and a test checks the installed copies still match.
+   On 14 Nov 2026, on the owner's instruction, built-in example subjects and default audience,
+   domain and platform were removed from Motion Director and Agent 00's examples.
    Approved exceptions, all additions made on 13 Nov 2026 to Agent 00's catalog tool, skill text
    and analysis schema: local media files can be catalogued (`file:<path>`, deduplicated by
    content hash); a `blocked` analysis must give a `blocked_reason`; the shot export carries
@@ -59,8 +61,12 @@ is waiting on the owner. Do not describe anything as working unless that file or
 10. **The owner's input is the subject.** Work on what the owner supplied — their words,
     attachments and active project. An uploaded image with no prompt is a creative reference for
     Agent 00. Never substitute a built-in example or sample topic, even for a test, and never
-    assume WHS/HSE or LinkedIn unless the owner asks for that domain. If the input is missing or
-    cannot be opened, ask for it.
+    assume a domain, audience or platform the owner did not name. Stay on the current project
+    unless the owner changes it. A named specialist does not change the subject: if it does not
+    fit the material, say so. If the input is missing, unclear or cannot be opened, ask for it.
+    Run `python3 studio/studio.py route` on every request; two hooks back this up
+    (`context_hook.py` on each message, `brief_gate.py` before a specialist starts). Sample
+    subjects live only in `tests/fixtures/` and are never live inputs.
 
 ## Source discipline
 
@@ -99,13 +105,15 @@ the owner to define a genre before recognising one.
 | `.claude/skills/{ultra-realistic-portrait,navratri-photoshoot}/` | Portrait prompt skills |
 | `.claude/skills/ig-*/` | Instagram scripting, captions, planning, audit (third-party pack, MIT) |
 | `.claude/hooks/paid_gate.py`, `.claude/settings.json` | Paid-generation approval gate |
+| `.claude/hooks/context_hook.py`, `.claude/hooks/brief_gate.py` | Current-project context on every message; no specialist starts without the owner's input |
 | `studio/studio.py`, `studio/schema.sql` | Database tool and schema |
 | `studio/video_probe.py` | Reference-video shot breakdown (ffmpeg) |
 | `studio/contracts.py` | JSON contracts between specialists |
 | `studio/adapters/` | Service adapters; Kling is dry-run only |
 | `.claude/agents/` | Subagents: `inspiration-intelligence` (Agent 00), `generation-director`, `qa-reviewer` |
 | `.claude/skills/{motion-director,cinematic-reel-storyboard,inspiration-intelligence}/` | Owner's recovered skills, installed verbatim |
-| `tools/inspiration.py`, `references/` | Agent 00's catalog tool and analysis schema (with the approved additions), sample import |
+| `tools/inspiration.py`, `references/` | Agent 00's catalog tool and analysis schema (with the approved changes) |
+| `tests/fixtures/` | Sample subjects for automated tests only; never live inputs |
 | `archive/` | Unaltered recovered originals; nothing here is loaded |
 | `studio/config/studio.json` | Budgets, agent model choices, paid-tool pattern |
 | `data/` | `studio.sql` snapshot, Agent 00 catalog (`inspirations.sqlite3`), Instagram state (`data/instagram/`) |

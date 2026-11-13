@@ -271,49 +271,188 @@ FIRST_SPECIALIST = {
     "E": "motion-director skill, given the owner's actual subject",
 }
 NO_DEFAULTS = ("The subject is whatever the owner supplied. Never substitute a sample, example or built-in "
-               "topic, and never assume WHS/HSE or LinkedIn unless the owner asked for that domain.")
+               "topic, and never assume a domain, audience or platform the owner did not name.")
+
+# name pattern, what it needs, workflows it fits
+SPECIALISTS = {
+    "motion-director": (r"motion[- ]?director", "a title or subject for a motion-graphics piece", {"E"}),
+    "cinematic-reel-storyboard": (r"storyboard", "a reference video", {"C"}),
+    "inspiration-intelligence": (r"agent ?00|inspiration[- ]intelligence", "a reference: an image, video or link", {"B", "C"}),
+    "generation-director": (r"generation[- ]?director", "a project with an approved concept", {"A", "B", "D"}),
+    "qa-reviewer": (r"qa[- ]?reviewer|quality review", "an output file to review", {"A", "B", "D", "E"}),
+}
+FILLER = (r"\b(please|now|then|ok|okay|yes|proceed|continue|resume|carry on|go ahead|next|keep going|start|begin|"
+          r"run|use|try|test|testing|tests|tested|with|the|a|an|on|to|and|of|for|my|our|skill|agent|subagent|"
+          r"specialist|it|this|that|again|step|stage|work|working|project)\b")
+CONTINUE = r"^\W*(please\s+)?(continue|resume|carry on|proceed|go ahead|next|keep going)\b"
+NEW_PROJECT = r"\bnew (project|idea|concept|shoot|reel|video)\b|\bstart (a|another) "
 
 
-def route_request(text: str, attachments: list[str]) -> dict:
-    """Decide the workflow from what the owner actually supplied: attachments first, then words."""
+def current_project(con) -> sqlite3.Row | None:
+    r = con.execute("SELECT value FROM meta WHERE key='current_project'").fetchone()
+    if not r:
+        return None
+    p = con.execute("SELECT * FROM projects WHERE id=? AND status IN ('active','paused')", (r[0],)).fetchone()
+    return p
+
+
+def set_current_project(con, pid: str | None) -> None:
+    if pid is None:
+        con.execute("DELETE FROM meta WHERE key='current_project'")
+    else:
+        con.execute("INSERT OR REPLACE INTO meta(key,value) VALUES('current_project',?)", (pid,))
+
+
+def route_request(text: str, attachments: list[str], current: dict | None = None) -> dict:
+    """Decide what to do from what the owner actually supplied: attachments, words, current project."""
     text = (text or "").strip()
+    low = text.lower()
     images = [p for p in attachments if Path(p).suffix.lower() in IMAGE_EXT]
     videos = [p for p in attachments if Path(p).suffix.lower() in VIDEO_EXT]
     other = [p for p in attachments if p not in images and p not in videos]
     if not text and not attachments:
         raise StudioError("No input to route. Ask the owner what they want made, or for the attachment. " + NO_DEFAULTS)
+
+    named = next((n for n, (pat, _, _) in SPECIALISTS.items() if re.search(pat, low)), None)
+    remainder = low
+    if named:
+        remainder = re.sub(SPECIALISTS[named][0], " ", remainder)
+    subject_words = re.sub(r"[^a-z0-9 ]+", " ", re.sub(FILLER, " ", remainder)).split()
+    has_subject = bool(subject_words) or bool(attachments) or bool(re.search(r"https?://", low))
+
     by_text = route(text) if text else None
     explicit = by_text["workflow"] if by_text and by_text["matched"] else None
-    own_footage = bool(re.search(r"\b(my|our) (own )?(footage|clips?|rushes|takes)\b|\bi (shot|filmed)\b|\bedit (this|these|my)\b", text.lower()))
-    clarify = None
+    own_footage = bool(re.search(r"\b(my|our) (own )?(footage|clips?|rushes|takes)\b|\bi (shot|filmed)\b|\bedit (this|these|my)\b", low))
+
+    res = {"action": "new_work", "workflow": None, "name": None, "rationale": None,
+           "input_detected": {"text": text or None, "images": images, "videos": videos, "other_files": other},
+           "named_specialist": named, "first_specialist": None, "pass_to_specialist": list(attachments),
+           "current_project": ({k: current[k] for k in ("id", "title", "workflow", "stage", "status")} if current else None),
+           "needs_clarification": None, "flags": [], "rule": NO_DEFAULTS}
+
+    def clarify(msg: str, flag: str) -> dict:
+        res.update(action="clarify", needs_clarification=msg)
+        res["flags"].append(flag)
+        return res
+
+    # 1. A named specialist with no subject of its own: it works on the current project or not at all.
+    if named and not has_subject:
+        _, needs, fits = SPECIALISTS[named]
+        if current and current["workflow"] in fits:
+            res.update(action="continue_project", workflow=current["workflow"], name=WORKFLOWS[current["workflow"]][0],
+                       first_specialist=named, pass_to_specialist=[current["id"]],
+                       rationale=f"{named} named with no new subject; it fits the current project {current['id']}")
+            return res
+        if current:
+            return clarify(
+                f"{named} needs {needs}, and none was given. The current project {current['id']} "
+                f"\"{current['title']}\" is workflow {current['workflow']} ({WORKFLOWS[current['workflow']][0]}), which "
+                f"{named} does not fit. Tell the owner this and ask what subject they want, or whether to "
+                f"continue {current['id']} with the specialist that does fit. Do not pick a subject.",
+                "incompatible_specialist")
+        return clarify(f"{named} needs {needs}, and none was given. Ask the owner for it. Do not pick a subject.",
+                       "missing_subject")
+
+    # 2. "Continue" with nothing new: stay on the current project.
+    if not attachments and not named and re.search(CONTINUE, low) and not subject_words:
+        if current:
+            res.update(action="continue_project", workflow=current["workflow"], name=WORKFLOWS[current["workflow"]][0],
+                       pass_to_specialist=[current["id"]],
+                       rationale=f"a request to continue with no new subject: stay on {current['id']}")
+            return res
+        return clarify("The owner asked to continue but there is no current project. Ask which project or what "
+                       "they want made. Do not pick a subject.", "missing_subject")
+
+    # 3. New material: attachments first, then words.
     if videos and own_footage:
         wf, why = "A", "the owner's own footage: enter at the rough-cut stage"
     elif videos and explicit in ("D", "E"):
         wf, why = explicit, f"the words ask for workflow {explicit}; the attached video is its subject or reference"
     elif videos:
         wf, why = "C", "a video was attached with no instruction to edit it: treat it as a reference to analyse"
-        clarify = "Confirm this is a reference to study, not the owner's own footage to edit."
+        res["needs_clarification"] = "Confirm this is a reference to study, not the owner's own footage to edit."
+        res["flags"].append("ambiguous_video")
     elif images and explicit in ("D", "E"):
         wf, why = explicit, f"the words ask for workflow {explicit}; the attached image is its subject or reference"
     elif images:
         wf, why = "B", "an image was attached: treat it as a visual creative reference"
-    elif by_text:
+    elif other:
+        wf, why = "B", "an attachment of unknown type: ask Agent 00 to identify it"
+        res["needs_clarification"] = "Unrecognised file type; confirm what it is."
+        res["flags"].append("unknown_attachment")
+    else:
         wf, why = by_text["workflow"], (f"matched '{by_text['matched']}'" if by_text["matched"] else
                                          "no reference, footage or generation request: an original idea")
+    if named:
+        _, needs, fits = SPECIALISTS[named]
+        if wf not in fits and not (named == "motion-director" and not attachments):
+            return clarify(
+                f"The owner named {named}, which needs {needs}, but what they supplied is workflow {wf} "
+                f"({WORKFLOWS[wf][0]}). Say so and ask which they want. Do not change the subject to suit the specialist.",
+                "incompatible_specialist")
+        if named == "motion-director" and not attachments:
+            wf, why = "E", "the owner named motion-director and gave a subject in words"
+    res.update(workflow=wf, name=WORKFLOWS[wf][0], rationale=why, first_specialist=named or FIRST_SPECIALIST[wf])
+    if current and not re.search(NEW_PROJECT, low):
+        res["flags"].append("current_project_exists")
+        res["project_note"] = (f"{current['id']} \"{current['title']}\" is the current project. If this input plainly "
+                               "belongs to it, continue it; if it is plainly new, say you are opening a new project; "
+                               "if unclear, ask. Never drop the current project silently.")
+    return res
+
+
+def studio_context(con, prompt: str = "") -> str:
+    """Plain-text context injected on every owner message by .claude/hooks/context_hook.py."""
+    cur = current_project(con)
+    lines = ["[Studio context, generated by studio/studio.py. This is not a message from the owner.]"]
+    if cur:
+        pend = [f"{r['id']} ({r['gate']})" for r in con.execute(
+            "SELECT id,gate FROM approvals WHERE project_id=? AND status='pending' ORDER BY rowid", (cur["id"],))]
+        lines.append(f"Current project: {cur['id']} \"{cur['title']}\" (workflow {cur['workflow']}, stage {cur['stage']}, "
+                     f"{cur['status']})." + (f" Waiting on the owner: {', '.join(pend)}." if pend else ""))
     else:
-        wf, why = "B", "an attachment of unknown type: ask Agent 00 to identify it"
-        clarify = "Unrecognised file type; confirm what it is."
-    return {"workflow": wf, "name": WORKFLOWS[wf][0], "rationale": why,
-            "input_detected": {"text": text or None, "images": images, "videos": videos, "other_files": other},
-            "first_specialist": FIRST_SPECIALIST[wf],
-            "pass_to_specialist": attachments, "needs_clarification": clarify, "rule": NO_DEFAULTS}
+        lines.append("Current project: none.")
+    others = [f"{r['id']} \"{r['title']}\"" for r in con.execute(
+        "SELECT id,title FROM projects WHERE status IN ('active','paused') AND id<>? ORDER BY updated_at DESC LIMIT 5",
+        (cur["id"] if cur else "",))]
+    if others:
+        lines.append("Other open projects: " + "; ".join(others) + ".")
+    if prompt.strip():
+        try:
+            r = route_request(prompt, [], dict(cur) if cur else None)
+            hint = f"Routing check on the owner's words alone: action={r['action']}"
+            if r["named_specialist"]:
+                hint += f", named specialist={r['named_specialist']}"
+            if r["flags"]:
+                hint += f", flags={','.join(r['flags'])}"
+            lines.append(hint + ".")
+            if r["needs_clarification"]:
+                lines.append("STOP AND ASK: " + r["needs_clarification"])
+        except StudioError:
+            pass
+    lines += [
+        "Input rules (CLAUDE.md rule 10):",
+        "1. The subject is the owner's words, attachments and current project. Attachments come first: "
+        "rerun `python3 studio/studio.py route \"<words>\" --attachment <path>` for any uploaded file.",
+        "2. Never substitute a sample, example or built-in topic, and never assume a domain, audience or platform.",
+        "3. Stay on the current project unless the owner changes it. A named specialist does not change the subject.",
+        "4. Give every specialist the owner's files and IDs. If input is missing or unclear, ask.",
+    ]
+    return "\n".join(lines)
 
 
 def cmd_route(a):
-    r = route_request(a.text, a.attachment or [])
-    r["stages"] = [{"stage": s, "requires_approval": g} for s, g in WORKFLOWS[r["workflow"]][1]]
-    r["note"] = "Heuristic. The orchestrator may override it; say why when it does."
+    con = connect()
+    cur = current_project(con)
+    r = route_request(a.text, a.attachment or [], dict(cur) if cur else None)
+    if r["workflow"]:
+        r["stages"] = [{"stage": s, "requires_approval": g} for s, g in WORKFLOWS[r["workflow"]][1]]
+    r["note"] = "Heuristic. The coordinator may override it; say why when it does."
     out(r)
+
+
+def cmd_context(a):
+    print(studio_context(connect(), a.prompt or ""))
 
 
 def cmd_workflows(a):
@@ -336,6 +475,7 @@ def cmd_project_new(a):
     for ins in a.inspiration or []:
         row(con, "inspirations", ins)
         con.execute("INSERT INTO project_inspirations VALUES(?,?)", (pid, ins))
+    set_current_project(con, pid)
     con.commit()
     out({"ok": True, "project": as_dict(row(con, "projects", pid))})
 
@@ -356,6 +496,7 @@ def project_status(con, pid: str) -> dict:
         "WHERE project_id=? ORDER BY rowid", (pid,))]
     return {
         "project": dict(p),
+        "is_current_project": bool(current_project(con) and current_project(con)["id"] == pid),
         "workflow_name": WORKFLOWS[p["workflow"]][0],
         "completed_stages": names[:i],
         "current_stage": p["stage"],
@@ -432,6 +573,8 @@ def _set_status(a, new, allowed_from):
     con.execute("UPDATE projects SET status=?, updated_at=? WHERE id=?", (new, t, a.project))
     con.execute("INSERT INTO stage_history(project_id,from_stage,to_stage,note,at) VALUES(?,?,?,?,?)",
                 (a.project, p["stage"], p["stage"], f"status -> {new}" + (f": {a.note}" if a.note else ""), t))
+    if new == "active":
+        set_current_project(con, a.project)
     con.commit()
     out({"ok": True, **project_status(con, a.project)})
 
@@ -446,6 +589,17 @@ def cmd_project_resume(a):
 
 def cmd_project_cancel(a):
     _set_status(a, "cancelled", ("active", "paused"))
+
+
+def cmd_project_use(a):
+    """Make a project the current one. Only on the owner's instruction."""
+    con = connect()
+    p = row(con, "projects", a.project)
+    if p["status"] not in ("active", "paused"):
+        raise StudioError(f"{a.project} is {p['status']} and cannot be the current project")
+    set_current_project(con, a.project)
+    con.commit()
+    out({"ok": True, "current_project": a.project, "title": p["title"]})
 
 
 def cmd_project_link(a):
@@ -1226,6 +1380,8 @@ def build_parser() -> argparse.ArgumentParser:
     p = add(sub, "route", cmd_route, "choose a workflow from the owner's words and attachments")
     p.add_argument("text", nargs="?", default="")
     p.add_argument("--attachment", action="append", help="path of an uploaded file (repeatable)")
+    p = add(sub, "context", cmd_context, "current project and input rules (used by the prompt hook)")
+    p.add_argument("--prompt")
     p = add(sub, "budget", cmd_budget, "budget position")
     p.add_argument("--project")
 
@@ -1241,6 +1397,7 @@ def build_parser() -> argparse.ArgumentParser:
     for name, fn in (("pause", cmd_project_pause), ("resume", cmd_project_resume), ("cancel", cmd_project_cancel)):
         p = add(g, name, fn, f"{name} a project"); p.add_argument("project"); p.add_argument("--note")
     p = add(g, "link", cmd_project_link, "link an inspiration"); p.add_argument("project"); p.add_argument("inspiration")
+    p = add(g, "use", cmd_project_use, "make this the current project (on the owner's instruction)"); p.add_argument("project")
 
     g = group("approval", "approval checkpoints")
     p = add(g, "request", cmd_approval_request, "open an approval; then stop and ask the user")

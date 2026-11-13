@@ -23,10 +23,8 @@ A00 = PACK / "02_AGENT_00_PACKAGE" / "EXTRACTED_FOR_REVIEW" / "cinematic-content
 TEMPLATE = ORIG / "SHOT_MANIFEST_TEMPLATE.csv"
 
 INSTALLED = {
-    ".claude/skills/motion-director/SKILL.md": ORIG / "SKILL(1).md",
     ".claude/skills/cinematic-reel-storyboard/SKILL.md": ORIG / "Cinematic_Storyboard_SKILL_v2.md",
     ".claude/agents/inspiration-intelligence.md": A00 / ".claude/agents/inspiration-intelligence.md",
-    "references/import-example.csv": A00 / "references/import-example.csv",
 }
 
 
@@ -48,20 +46,22 @@ class TestVerbatimInstall(unittest.TestCase):
     def test_agent00_skill_keeps_every_original_line_and_declares_its_additions(self):
         original = (A00 / ".claude/skills/inspiration-intelligence/SKILL.md").read_text()
         current = (ROOT / ".claude/skills/inspiration-intelligence/SKILL.md").read_text()
-        for line in original.splitlines():
-            if line.strip():
-                self.assertIn(line.rstrip(), current, line[:60])       # additions only, nothing removed
+        gone = [l for l in original.splitlines() if l.strip() and l.rstrip() not in current]
+        self.assertEqual(len(gone), 3, gone)                # only the three command examples that named sample subjects
+        for l in gone:
+            self.assertTrue(l.startswith("- `python3 tools/inspiration.py "), l)
         self.assertIn("## Change note", current)
 
     def test_analysis_schema_keeps_every_original_field(self):
         original = json.loads((A00 / "references/analysis-schema.json").read_text())
         current = json.loads((ROOT / "references/analysis-schema.json").read_text())
-        for k, v in original.items():
-            if k != "shot_candidates":
-                self.assertEqual(current[k], v, k)
-        for k, v in original["shot_candidates"][0].items():
-            self.assertEqual(current["shot_candidates"][0][k], v, k)
+        for k in original:
+            self.assertIn(k, current, k)                    # same shape; sample content replaced by placeholders
+        for part in ("techniques", "shot_candidates"):
+            for k in original[part][0]:
+                self.assertIn(k, current[part][0], f"{part}.{k}")
         self.assertIn("blocked_reason", current)
+        self.assertNotIn("portal", json.dumps(current).lower())
 
     def test_archive_still_matches_the_packs_own_checksums(self):
         lines = [l.split() for l in (PACK / "03_HANDOFF" / "SOURCE_CHECKSUMS.txt").read_text().splitlines()
@@ -86,6 +86,19 @@ class TestVerbatimInstall(unittest.TestCase):
         self.assertLess(text.index("IDEA APPROVAL gate"), text.index("STYLE APPROVAL gate"))
         self.assertIn("Never show, recommend, shortlist, or ask the user to select a visual style before idea approval", text)
         self.assertIn("three custom static preview images", text)
+
+    def test_motion_director_keeps_its_method_after_the_topic_removal(self):
+        original = (ORIG / "SKILL(1).md").read_text()
+        current = (ROOT / ".claude/skills/motion-director/SKILL.md").read_text()
+        changed = [l for l in original.splitlines() if l.strip() and l.rstrip() not in current]
+        self.assertEqual(len(changed), 10, changed)                # the ten approved line edits and no others
+        for heading in [l for l in original.splitlines() if l.startswith("#")]:
+            self.assertIn(heading, current)
+        styles = lambda t: [l.split("|")[1].strip() for l in t.split("## Style selection library")[1].split("## Final response")[0].splitlines() if l.startswith("| ") and "---" not in l]
+        self.assertEqual(styles(original), styles(current))        # all 20 styles, same names, same order
+        for n in range(1, 13):
+            self.assertIn(f"\n{n}. `", current)                    # the 12-part production brief
+        self.assertIn("## Change note", current)
 
     def test_v04_editing_skills_were_not_replaced_by_the_older_drafts(self):
         for folder in ("rough-cut", "colour-grading", "effects-and-transitions", "reel-assembly", "cinematic-reel-editing"):
@@ -203,13 +216,13 @@ class TestAgent00Mirror(Base):
         self.assertEqual(sorted(r["genres_added"]), ["Fantasy", "cinematic fashion"])
 
     def test_sync_is_idempotent(self):
-        self.a00("import", str(ROOT / "references" / "import-example.csv"))
+        self.a00("import", str(ROOT / "tests" / "fixtures" / "agent00-import-sample.csv"))
         first = self.sync()
         self.assertEqual(len(first["created"]), 2)
         again = self.sync()
         self.assertEqual((again["created"], again["updated"], again["unchanged"], again["analyses_added"]), ([], [], 2, 0))
         self.assertEqual(len(self.ok("ins", "list")), 2)
-        self.a00("import", str(ROOT / "references" / "import-example.csv"))      # Agent 00 import is idempotent too
+        self.a00("import", str(ROOT / "tests" / "fixtures" / "agent00-import-sample.csv"))      # Agent 00 import is idempotent too
         self.assertEqual(self.sync()["mirrored_total"], 2)
 
     def test_sync_never_writes_to_agent00s_catalog(self):
@@ -520,5 +533,5 @@ class TestAgent00GapFixes(Base):
 
     def test_skill_documents_the_three_additions(self):
         text = (ROOT / ".claude/skills/inspiration-intelligence/SKILL.md").read_text()
-        for needle in ("add media/incoming/clip.mp4", "blocked_reason", "network_policy", "start_time"):
+        for needle in ("add <path to the file>", "blocked_reason", "network_policy", "start_time"):
             self.assertIn(needle, text)

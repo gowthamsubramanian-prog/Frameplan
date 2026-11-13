@@ -8,11 +8,11 @@ description: Collect and analyse saved Instagram Reels, Pinterest pins/boards, Y
 Operate from the Cinematic Content Studio project root.
 
 ## Ingest
-- `python3 tools/inspiration.py add 'https://...' --collection 'Saved Reels'`
-- `python3 tools/inspiration.py add media/incoming/clip.mp4 --title 'Downloaded reel'` — a local photo or video with no known link. It is stored as `file:<path>` and deduplicated by content; never invent a URL for it.
-- `python3 tools/inspiration.py import references.csv --collection 'Pinterest Ideas'`
+- `python3 tools/inspiration.py add '<link>' --collection '<collection name>'`
+- `python3 tools/inspiration.py add <path to the file> --title '<title>'` — a local photo or video with no known link. It is stored as `file:<path>` and deduplicated by content; never invent a URL for it.
+- `python3 tools/inspiration.py import <file.csv> --collection '<collection name>'`
 - `python3 tools/inspiration.py list`
-- `python3 tools/inspiration.py search 'portal silhouette slow push-in'`
+- `python3 tools/inspiration.py search '<search terms>'`
 
 Accepted CSV headers: `url,creator,title,notes,collection` (only `url` required). JSON imports may be an array of URLs or objects using those keys. Existing records are deduplicated by normalized source URL; URLs are stored intact separately from the comparison key. Do not erase user notes.
 
@@ -33,4 +33,4 @@ Accepted CSV headers: `url,creator,title,notes,collection` (only `url` required)
 For each recommendation send source IDs, links, exact observed evidence, genre, usable technique, practical recreation path, risks and uncertainty. IDEA APPROVAL happens before STYLE APPROVAL; never leak style recommendations into the idea stage.
 
 ## Change note
-Three additions were made on 13 Nov 2026 with the owner's approval: local-file intake, `blocked_reason`, and shot timecodes in the export. The original text is in `archive/recovery-pack-2026-11-13/`.
+Three additions were made on 13 Nov 2026 with the owner's approval: local-file intake, `blocked_reason`, and shot timecodes in the export. On 14 Nov 2026 the sample subjects in the command examples were replaced with placeholders. The original text is in `archive/recovery-pack-2026-11-13/`.

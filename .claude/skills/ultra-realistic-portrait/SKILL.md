@@ -60,7 +60,7 @@ Use this when the user wants image-generation prompts for photorealistic portrai
 3. Output each shot as a short heading (e.g. "Shot 1 - Close-up") followed by the prompt in its own code block so it copies cleanly on mobile.
 4. End with one line: attach the same reference photo to every prompt and generate them one at a time.
 
-## Worked example: South Indian Courtyard saree set
+## Worked example: South Indian Courtyard saree set (illustration of the method only; never use it as a live subject)
 
 Shared look: premium Pinterest-style luxury Indian ethnic catalogue photo; minimal South Indian courtyard with cream plaster walls, terracotta pots and subtle leaf shadows; warm golden afternoon sunlight; 85mm lens, f/2.
 

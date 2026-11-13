@@ -287,6 +287,7 @@ CREATE TABLE meta (
 );
 INSERT INTO "meta" VALUES('created_at','2026-11-13T04:47:52Z');
 INSERT INTO "meta" VALUES('schema_version','2');
+INSERT INTO "meta" VALUES('current_project','PRJ-0001');
 CREATE TABLE metrics (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   publication_id TEXT NOT NULL REFERENCES publications(id),
