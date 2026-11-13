@@ -41,6 +41,7 @@ CREATE TABLE approvals (
   requested_at TEXT NOT NULL,
   decided_at  TEXT
 );
+INSERT INTO "approvals" VALUES('APR-0001',NULL,'manifest_update','RSH-0001,RSH-0002','2 reference shot(s)','approved',NULL,NULL,NULL,0,'1. Approve','2026-11-13T20:57:42Z','2026-11-13T20:57:42Z');
 CREATE TABLE assets (
   id           TEXT PRIMARY KEY,               -- AST-0001
   project_id   TEXT REFERENCES projects(id),
@@ -118,6 +119,8 @@ CREATE TABLE id_counters (
 INSERT INTO "id_counters" VALUES('GEN',10);
 INSERT INTO "id_counters" VALUES('INS',3);
 INSERT INTO "id_counters" VALUES('RSH',3);
+INSERT INTO "id_counters" VALUES('APR',2);
+INSERT INTO "id_counters" VALUES('PRJ',2);
 CREATE TABLE inspiration_analyses (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
@@ -205,6 +208,8 @@ CREATE TABLE project_inspirations (
   inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
   PRIMARY KEY (project_id, inspiration_id)
 );
+INSERT INTO "project_inspirations" VALUES('PRJ-0001','INS-0001');
+INSERT INTO "project_inspirations" VALUES('PRJ-0001','INS-0002');
 CREATE TABLE projects (
   id           TEXT PRIMARY KEY,               -- PRJ-0001
   title        TEXT NOT NULL,
@@ -217,6 +222,7 @@ CREATE TABLE projects (
   created_at   TEXT NOT NULL,
   updated_at   TEXT NOT NULL
 );
+INSERT INTO "projects" VALUES('PRJ-0001','Candle portrait shoot','B','ingest','active','Candle-themed portrait shoot from two saved references (REF-000001, REF-000002). Owner decision 13 Nov 2026: use REAL candles, not LED with composited flames. Plan the prop, hair styling and safety measures around live flame. No source links or creators beyond the Cap2red Studio watermark on REF-000001.',NULL,10.0,'2026-11-13T20:57:42Z','2026-11-13T20:57:42Z');
 CREATE TABLE prompts (
   id         TEXT PRIMARY KEY,                 -- PRM-0001
   project_id TEXT NOT NULL REFERENCES projects(id),
@@ -262,8 +268,8 @@ CREATE TABLE reference_shots (
   created_at      TEXT NOT NULL,
   decided_at      TEXT
 );
-INSERT INTO "reference_shots" VALUES('RSH-0001','INS-0001','REF-000001',NULL,NULL,'shot_proposals.csv','candle-shoulder over-the-shoulder profile close-up','PROPOSED-0001','','','CU','top of head to upper chest and near shoulder; both hands in frame','three-quarter profile from behind the near shoulder (over-the-shoulder)','chin to shoulder height, level','4:5 vertical; subject fills right two thirds; blurred pillar-candle practicals in the dark left third; shoulder candles lower centre','still pose: chin lifted, eyes closed, fingertips at lips','none (still photograph)','not recorded in file; short telephoto inferred, 85mm suggested','not recorded in file; suggested f/2-2.8, 1/125 s, ISO 800-3200, RAW','media/incoming/1000162216.jpg','','observed','PENDING_REVIEW',NULL,'ce92c7832365b435742a8a769cd142bd28baab1d19f971ce434b6f4cc21a4bee','2026-11-13T20:52:13Z',NULL);
-INSERT INTO "reference_shots" VALUES('RSH-0002','INS-0002','REF-000002',NULL,NULL,'shot_proposals.csv','candles on bare shoulder with orange cheek glow, downcast gaze','PROPOSED-0002','','','CU','forehead (top of head cropped) to upper arm; one hand at bottom edge','front three-quarter, model''s head turned towards her near shoulder','eye level or slightly above, level','1:1 square; face upper centre-left, twin flames lower centre-right forming an eye-to-flame diagonal; hair fills left third; plain teal-black background','still pose: head tilted down, eyes lowered to the flames, hand holding upper arm','none (still image)','not recorded in file and image may be synthetic; 85mm suggested','not recorded in file; suggested f/2.8-4, 1/125 s, ISO 400-1600, RAW','media/incoming/1000162212.jpg','','observed','PENDING_REVIEW',NULL,'fd095da24ab5252bcbe1b647a1c33f09c0c0557a84888b046a06d6b6042fb129','2026-11-13T20:52:13Z',NULL);
+INSERT INTO "reference_shots" VALUES('RSH-0001','INS-0001','REF-000001',NULL,NULL,'shot_proposals.csv','candle-shoulder over-the-shoulder profile close-up','PROPOSED-0001','','','CU','top of head to upper chest and near shoulder; both hands in frame','three-quarter profile from behind the near shoulder (over-the-shoulder)','chin to shoulder height, level','4:5 vertical; subject fills right two thirds; blurred pillar-candle practicals in the dark left third; shoulder candles lower centre','still pose: chin lifted, eyes closed, fingertips at lips','none (still photograph)','not recorded in file; short telephoto inferred, 85mm suggested','not recorded in file; suggested f/2-2.8, 1/125 s, ISO 800-3200, RAW','media/incoming/1000162216.jpg','','observed','APPROVED','APR-0001','ce92c7832365b435742a8a769cd142bd28baab1d19f971ce434b6f4cc21a4bee','2026-11-13T20:52:13Z','2026-11-13T20:57:42Z');
+INSERT INTO "reference_shots" VALUES('RSH-0002','INS-0002','REF-000002',NULL,NULL,'shot_proposals.csv','candles on bare shoulder with orange cheek glow, downcast gaze','PROPOSED-0002','','','CU','forehead (top of head cropped) to upper arm; one hand at bottom edge','front three-quarter, model''s head turned towards her near shoulder','eye level or slightly above, level','1:1 square; face upper centre-left, twin flames lower centre-right forming an eye-to-flame diagonal; hair fills left third; plain teal-black background','still pose: head tilted down, eyes lowered to the flames, hand holding upper arm','none (still image)','not recorded in file and image may be synthetic; 85mm suggested','not recorded in file; suggested f/2.8-4, 1/125 s, ISO 400-1600, RAW','media/incoming/1000162212.jpg','','observed','APPROVED','APR-0001','fd095da24ab5252bcbe1b647a1c33f09c0c0557a84888b046a06d6b6042fb129','2026-11-13T20:52:13Z','2026-11-13T20:57:42Z');
 CREATE TABLE shot_manifest (
   id          TEXT PRIMARY KEY,                -- SHT-0001
   name        TEXT NOT NULL,
@@ -293,6 +299,7 @@ CREATE TABLE stage_history (
   note       TEXT,
   at         TEXT NOT NULL
 );
+INSERT INTO "stage_history" VALUES(1,'PRJ-0001',NULL,'ingest','project created','2026-11-13T20:57:42Z');
 CREATE TABLE technique_shots (
   technique_id      TEXT NOT NULL REFERENCES shot_manifest(id),
   reference_shot_id TEXT NOT NULL REFERENCES reference_shots(id),
