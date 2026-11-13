@@ -45,13 +45,16 @@ except Agent 00's catalog tool, skill text and analysis schema, which carry appr
 | Agent 00 catalog tool | `tools/inspiration.py` | **Modified 13 Nov 2026 (approved):** `add` and `import` accept a local media file, stored as `file:<path>` and deduplicated by content hash; bad input gives a clean error. Link handling unchanged. A `blocked` analysis must give a reason from a fixed list; `export-shots` carries timecodes, frame names, focal length and settings from the analysis and says when there is nothing to export. Catalogs made by the original tool upgrade in place. Tested |
 | Analysis schema, sample import | `references/` | Schema gained optional fields (approved); sample import unchanged |
 
-**Agent 00 test status:** one independent run on 13 November 2026
-(`docs/tests/AGENT00_TEST_2026-11-13.md`). Passed for a blocked link and for whole-file
-inspection of a local video. **Not yet tested on a real accessible reference**, and the run used
-a general-purpose agent following Agent 00's definition because the new agent type was not
-registered in that session. The gaps that run exposed (local files, the reason for a block, empty timecodes in
-the export, skill text) are fixed and tested at the tool level; **Agent 00 itself has not been
-re-run since**, so whether it uses the new fields correctly is unproven.
+**Agent 00 test status: tested for still images and for honest failure; not yet for video or links.**
+
+| Test | Log | Result |
+|---|---|---|
+| Blocked Instagram link; synthetic local video (general-purpose agent following the definition) | `docs/tests/AGENT00_TEST_2026-11-13.md` | Passed, exposed four gaps, all since fixed |
+| Two real still photographs, run as the registered subagent on the real catalog | `docs/tests/AGENT00_TEST_2026-11-13_real_references.md` | Passed on every check |
+
+Still untested: real video (timecoded shots, camera movement, editing), any link that opens, and
+saved-collection import. The catalog now holds `REF-000001` and `REF-000002`, mirrored as
+`INS-0001` and `INS-0002`, with two reference shots pending the owner's decision.
 
 Older editing drafts (v0.1/v0.2) stay in the archive only; see `docs/EDITING_DRAFTS_GAP_REVIEW.md`.
 
@@ -69,14 +72,13 @@ Older editing drafts (v0.1/v0.2) stay in the archive only; see `docs/EDITING_DRA
 | Populated Master Shot Manifest | The real file if one exists; otherwise it fills through approved proposals |
 | `frameplan-reference-analyser` | The skill file. Not assumed to be Agent 00 |
 | Frameplan app | Source location (`projects.external_ref` is ready to hold its IDs). Not to be modified |
-| A real accessible reference for Agent 00 | An uploaded photo or clip, or outside hosts allowed in the environment |
+| A real reference video for Agent 00 | An uploaded clip, to test timecoded analysis |
 
 ## Planned (approved scope, in order)
 
 One specialist at a time; each needs the owner's go-ahead and a logged test before the next.
 
-1. Agent 00: real-world test with an accessible reference, run as the registered subagent;
-   import the 16 rows from the "Shoot Planner & Inspiration" sheet.
+1. Agent 00: test on a real reference video; import the 16 rows from the "Shoot Planner & Inspiration" sheet.
 2. Storyboard: first run on a real reference video; build the local sketch, PDF and zip steps.
 3. Motion Director: first run to IDEA APPROVAL and three style previews.
 4. Creative Director (after spec review), then `shot-planner`.

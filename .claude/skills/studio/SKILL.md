@@ -44,7 +44,7 @@ Where it helps, produce two or three variants (`doc add --variant A|B|C`) and le
 
 | Stage work | Specialist | Status |
 |---|---|---|
-| Reference ingestion and analysis, genre discovery | the owner's Agent 00: `inspiration-intelligence` subagent and skill, `tools/inspiration.py`. Then `studio.py ins sync-agent00` | installed verbatim; first test passed for blocked links and local video inspection; local files can be catalogued (`tools/inspiration.py add <path>`), blocks carry a reason, shot exports carry timecodes; not re-run since those changes and not yet tested on a real accessible reference |
+| Reference ingestion and analysis, genre discovery | the owner's Agent 00: `inspiration-intelligence` subagent and skill, `tools/inspiration.py`. Then `studio.py ins sync-agent00` | **tested for still images and blocked links** (logs in `docs/tests/`); local files via `tools/inspiration.py add <path>`. Not yet tested on real video or on a link that opens |
 | Reference-video shot breakdown | `python3 studio/video_probe.py <video> --out <new folder>`; the owner's `cinematic-reel-storyboard` skill for the full storyboard; `studio.py refshot import` for the 15-column shot list | script tested; storyboard skill installed verbatim, untested; its sketch, PDF and zip steps are not built |
 | Concepts, creative direction, adaptation | Creative Director | **not installed** — draft specification awaiting review in `docs/drafts/CREATIVE_DIRECTOR_SPEC.md` |
 | Storyboard, shot list, cinematography, location and production plan | `shot-planner` subagent | not built yet |
