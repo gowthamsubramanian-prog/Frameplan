@@ -62,7 +62,7 @@ Older editing drafts (v0.1/v0.2) stay in the archive only; see `docs/EDITING_DRA
 
 | Document | Purpose |
 |---|---|
-| `docs/drafts/CREATIVE_DIRECTOR_SPEC.md` | Creative Director specification. Not installed, not active |
+| `docs/drafts/CREATIVE_DIRECTOR_SPEC.md` | Creative Director specification v1.0, final for the owner's sign-off. Not installed, not active. Implementation is deferred until the dependent specialists pass their tests |
 
 ## Still missing
 
