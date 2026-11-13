@@ -1,4 +1,4 @@
--- Cinematic Content Studio — shared database schema (version 1)
+-- Cinematic Content Studio — shared database schema (version 2)
 -- Written only through studio/studio.py. See docs/DATABASE_SCHEMA.md.
 
 CREATE TABLE IF NOT EXISTS meta (
@@ -15,17 +15,19 @@ CREATE TABLE IF NOT EXISTS id_counters (
 CREATE TABLE IF NOT EXISTS inspirations (
   id              TEXT PRIMARY KEY,            -- INS-0001
   source_type     TEXT NOT NULL CHECK (source_type IN
-                    ('instagram','pinterest','web','upload','idea','sheet')),
+                    ('instagram','pinterest','youtube','web','upload','idea','sheet')),
   title           TEXT NOT NULL,
   title_norm      TEXT NOT NULL,
   creator         TEXT,                        -- attribution, as given by the source
   notes           TEXT,                        -- the user's own words about why it was saved
-  access_status   TEXT NOT NULL DEFAULT 'not_attempted' CHECK (access_status IN
-                    ('not_attempted','accessible','inaccessible')),
-  access_detail   TEXT,                        -- e.g. "login wall", "HTTP 404"
+  collection      TEXT,                        -- saved-collection name, if any
+  -- Agent 00's five access states (references/analysis-schema.json)
+  access_status   TEXT NOT NULL DEFAULT 'unreviewed' CHECK (access_status IN
+                    ('unreviewed','blocked','metadata_only','reviewed_images','reviewed_video')),
+  access_detail   TEXT,                        -- e.g. "login wall", "network policy", "HTTP 404"
   analysis_status TEXT NOT NULL DEFAULT 'none' CHECK (analysis_status IN
                     ('none','partial','complete')),
-  analysis_json   TEXT,                        -- structured analysis; NULL until evidence exists
+  analysis_json   TEXT,                        -- latest analysis; full history in inspiration_analyses
   analysis_basis  TEXT,                        -- what was actually inspected
   source_meta_json TEXT,                       -- original row/metadata, preserved verbatim
   created_at      TEXT NOT NULL
@@ -36,6 +38,33 @@ CREATE TABLE IF NOT EXISTS inspiration_links (
   url            TEXT NOT NULL,                -- original link, unmodified
   url_norm       TEXT NOT NULL UNIQUE,         -- duplicate detection key
   PRIMARY KEY (inspiration_id, url)
+);
+
+-- Every analysis ever recorded for a reference; never updated or deleted.
+CREATE TABLE IF NOT EXISTS inspiration_analyses (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
+  origin         TEXT NOT NULL CHECK (origin IN ('agent00','studio')),
+  ref_id         TEXT,                         -- Agent 00 REF- id the analysis was written against
+  access_status  TEXT NOT NULL,
+  basis          TEXT,
+  analysis_json  TEXT NOT NULL,
+  content_hash   TEXT NOT NULL,
+  recorded_at    TEXT NOT NULL,
+  UNIQUE (inspiration_id, content_hash)
+);
+
+-- One row per record in Agent 00's catalog (data/inspirations.sqlite3). Agent 00 is the
+-- source of truth; this is a one-way mirror. Several REF ids may map to one inspiration
+-- when Agent 00's looser duplicate rule let the same post in twice.
+CREATE TABLE IF NOT EXISTS agent00_refs (
+  ref_id         TEXT PRIMARY KEY,             -- REF-000001, stable
+  inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
+  url            TEXT NOT NULL,                -- original URL exactly as Agent 00 stored it
+  is_duplicate   INTEGER NOT NULL DEFAULT 0,   -- 1 = same post as an earlier REF
+  source_updated_at TEXT,                      -- Agent 00's updated_at at last sync
+  first_synced_at TEXT NOT NULL,
+  last_synced_at  TEXT NOT NULL
 );
 
 -- ---------- Genre Knowledge Library ----------
@@ -59,6 +88,37 @@ CREATE TABLE IF NOT EXISTS inspiration_genres (
 );
 
 -- ---------- Master Shot Manifest ----------
+-- Two linked libraries:
+--   reference_shots  one row per shot in a reference video, in the owner's 15-column format
+--   shot_manifest    reusable techniques, each linked to the reference shots that show it
+CREATE TABLE IF NOT EXISTS reference_shots (
+  id              TEXT PRIMARY KEY,            -- RSH-0001
+  inspiration_id  TEXT REFERENCES inspirations(id),
+  ref_id          TEXT,                        -- Agent 00 REF- id, when the row came from Agent 00
+  asset_id        TEXT REFERENCES assets(id),
+  project_id      TEXT REFERENCES projects(id),
+  source_label    TEXT,                        -- file the row was imported from
+  candidate_label TEXT,
+  -- the 15 columns of SHOT_MANIFEST_TEMPLATE.csv, in order
+  shot_id TEXT, start_time TEXT, end_time TEXT, shot_size TEXT, body_crop TEXT,
+  camera_angle TEXT, camera_height TEXT, composition TEXT, model_movement TEXT,
+  camera_movement TEXT, focal_length TEXT, recording_settings TEXT, actual_frame TEXT,
+  sketch TEXT, confidence TEXT,
+  approval_status TEXT NOT NULL DEFAULT 'PENDING_REVIEW' CHECK (approval_status IN
+                    ('PENDING_REVIEW','APPROVED','REJECTED')),
+  approval_id     TEXT REFERENCES approvals(id),
+  row_hash        TEXT NOT NULL UNIQUE,        -- makes imports idempotent
+  created_at      TEXT NOT NULL,
+  decided_at      TEXT
+);
+
+CREATE TABLE IF NOT EXISTS technique_shots (
+  technique_id      TEXT NOT NULL REFERENCES shot_manifest(id),
+  reference_shot_id TEXT NOT NULL REFERENCES reference_shots(id),
+  note              TEXT,
+  PRIMARY KEY (technique_id, reference_shot_id)
+);
+
 CREATE TABLE IF NOT EXISTS shot_manifest (
   id          TEXT PRIMARY KEY,                -- SHT-0001
   name        TEXT NOT NULL,
@@ -255,3 +315,4 @@ CREATE TABLE IF NOT EXISTS metrics (
 CREATE INDEX IF NOT EXISTS idx_docs_project ON documents(project_id, kind);
 CREATE INDEX IF NOT EXISTS idx_approvals_project ON approvals(project_id, gate);
 CREATE INDEX IF NOT EXISTS idx_insp_title ON inspirations(title_norm);
+CREATE INDEX IF NOT EXISTS idx_refshots_insp ON reference_shots(inspiration_id);

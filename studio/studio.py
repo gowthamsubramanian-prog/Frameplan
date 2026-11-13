@@ -10,6 +10,7 @@ Exit codes: 0 ok, 1 error, 3 blocked by an approval gate or the budget.
 from __future__ import annotations
 
 import argparse
+import csv
 import datetime as dt
 import difflib
 import hashlib
@@ -24,7 +25,7 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parent.parent
 SCHEMA = Path(__file__).resolve().parent / "schema.sql"
 CONFIG = Path(__file__).resolve().parent / "config" / "studio.json"
-SCHEMA_VERSION = "1"
+SCHEMA_VERSION = "2"
 
 EXIT_ERROR = 1
 EXIT_BLOCKED = 3
@@ -110,7 +111,47 @@ def connect(create: bool = False) -> sqlite3.Connection:
     con = sqlite3.connect(p)
     con.row_factory = sqlite3.Row
     con.execute("PRAGMA foreign_keys = ON")
+    if not create:
+        v = schema_version(con)
+        if v != SCHEMA_VERSION:
+            con.close()
+            raise StudioError(f"Database schema is version {v}, this tool needs {SCHEMA_VERSION}. "
+                              "Run: python3 studio/studio.py init  (it upgrades in place, keeping all rows)")
     return con
+
+
+def schema_version(con) -> str | None:
+    if not con.execute("SELECT 1 FROM sqlite_master WHERE name='meta'").fetchone():
+        return None
+    r = con.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
+    return r[0] if r else None
+
+
+ACCESS_V1_TO_V2 = {"not_attempted": "unreviewed", "inaccessible": "blocked", "accessible": "reviewed_images"}
+
+
+def migrate_v1_to_v2(con) -> dict:
+    """Widen inspirations.access_status to Agent 00's five states. Keeps every row."""
+    ddl = re.search(r"CREATE TABLE IF NOT EXISTS inspirations \(.*?\n\);", SCHEMA.read_text(), re.S).group(0)
+    n = con.execute("SELECT COUNT(*) FROM inspirations").fetchone()[0]
+    con.commit()
+    con.execute("PRAGMA foreign_keys = OFF")
+    con.execute("BEGIN")
+    con.execute(ddl.replace("IF NOT EXISTS inspirations", "inspirations_v2"))
+    case = " ".join(f"WHEN '{a}' THEN '{b}'" for a, b in ACCESS_V1_TO_V2.items())
+    con.execute(
+        "INSERT INTO inspirations_v2(id,source_type,title,title_norm,creator,notes,access_status,access_detail,"
+        "analysis_status,analysis_json,analysis_basis,source_meta_json,created_at) "
+        f"SELECT id,source_type,title,title_norm,creator,notes,CASE access_status {case} END,access_detail,"
+        "analysis_status,analysis_json,analysis_basis,source_meta_json,created_at FROM inspirations")
+    con.execute("DROP TABLE inspirations")
+    con.execute("ALTER TABLE inspirations_v2 RENAME TO inspirations")
+    con.execute("COMMIT")
+    con.execute("PRAGMA foreign_keys = ON")
+    bad = con.execute("PRAGMA foreign_key_check").fetchall()
+    if bad:
+        raise StudioError(f"migration left {len(bad)} broken links; restore data/studio.sql and report this")
+    return {"from": "1", "to": "2", "inspirations_kept": n}
 
 
 def next_id(con: sqlite3.Connection, prefix: str) -> str:
@@ -190,13 +231,15 @@ def gate_open(con, project_id: str, gate: str) -> tuple[bool, str]:
 # ---------------------------------------------------------------- init / snapshot
 def cmd_init(a):
     con = connect(create=True)
+    before = schema_version(con)
+    migrated = migrate_v1_to_v2(con) if before == "1" else None
     con.executescript(SCHEMA.read_text())
-    con.execute("INSERT OR IGNORE INTO meta(key,value) VALUES('schema_version',?)", (SCHEMA_VERSION,))
+    con.execute("INSERT OR REPLACE INTO meta(key,value) VALUES('schema_version',?)", (SCHEMA_VERSION,))
     con.execute("INSERT OR IGNORE INTO meta(key,value) VALUES('created_at',?)", (now(),))
     con.commit()
     tables = [r[0] for r in con.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY 1")]
-    out({"ok": True, "db": str(db_path()), "schema_version": SCHEMA_VERSION, "tables": tables})
+    out({"ok": True, "db": str(db_path()), "schema_version": SCHEMA_VERSION, "migrated": migrated, "tables": tables})
 
 
 def cmd_snapshot(a):
@@ -537,21 +580,39 @@ def cmd_ins_access(a):
     out({"ok": True, "inspiration": a.inspiration, "access_status": a.status})
 
 
+REVIEWED = ("reviewed_video", "reviewed_images", "metadata_only")
+CERTAINTY = ("observed", "inferred", "suggested", "unverified")
+
+
+def record_analysis(con, iid, origin, access_status, analysis_text, basis, ref_id=None) -> bool:
+    """Append to the analysis history. Returns False when this exact analysis is already stored."""
+    h = hashlib.sha256(analysis_text.encode()).hexdigest()
+    cur = con.execute(
+        "INSERT OR IGNORE INTO inspiration_analyses(inspiration_id,origin,ref_id,access_status,basis,"
+        "analysis_json,content_hash,recorded_at) VALUES(?,?,?,?,?,?,?,?)",
+        (iid, origin, ref_id, access_status, basis, analysis_text, h, now()))
+    return cur.rowcount == 1
+
+
 def cmd_ins_analysis(a):
     con = connect()
     r = row(con, "inspirations", a.inspiration)
-    if r["access_status"] != "accessible":
+    if r["access_status"] not in REVIEWED:
         raise StudioError(
             f"Refused: {a.inspiration} is '{r['access_status']}'. Analysis may only be recorded for content "
-            "that was actually inspected. Mark it accessible (with what was inspected) or ask the user "
+            "that was actually inspected. Record what was inspected with `ins access` or ask the user "
             "for an upload or screenshot.", EXIT_BLOCKED)
     if not (a.basis or "").strip():
         raise StudioError("--basis is required: state exactly what was inspected (file, frames, page text)")
     data = json.loads(read_arg(a.json))
+    status = "partial" if r["access_status"] == "metadata_only" else a.status
+    text = json.dumps(data, ensure_ascii=False, sort_keys=True)
+    new = record_analysis(con, a.inspiration, "studio", r["access_status"], text, a.basis)
     con.execute("UPDATE inspirations SET analysis_json=?, analysis_basis=?, analysis_status=? WHERE id=?",
-                (json.dumps(data, ensure_ascii=False), a.basis, a.status, a.inspiration))
+                (text, a.basis, status, a.inspiration))
     con.commit()
-    out({"ok": True, "inspiration": a.inspiration, "analysis_status": a.status})
+    out({"ok": True, "inspiration": a.inspiration, "analysis_status": status, "new_history_entry": new,
+         "note": "metadata only: recorded as partial, not a media review" if status != a.status else None})
 
 
 def cmd_ins_show(a):
@@ -562,6 +623,13 @@ def cmd_ins_show(a):
     r["genres"] = [x[0] for x in con.execute(
         "SELECT g.name FROM genres g JOIN inspiration_genres ig ON ig.genre_id=g.id "
         "WHERE ig.inspiration_id=?", (a.inspiration,))]
+    r["agent00_refs"] = [dict(x) for x in con.execute(
+        "SELECT ref_id,url,is_duplicate FROM agent00_refs WHERE inspiration_id=? ORDER BY ref_id", (a.inspiration,))]
+    r["analysis_history"] = [dict(x) for x in con.execute(
+        "SELECT id,origin,ref_id,access_status,basis,recorded_at FROM inspiration_analyses "
+        "WHERE inspiration_id=? ORDER BY id", (a.inspiration,))]
+    r["reference_shots"] = [x[0] for x in con.execute(
+        "SELECT id FROM reference_shots WHERE inspiration_id=? ORDER BY id", (a.inspiration,))]
     out(r)
 
 
@@ -573,6 +641,222 @@ def cmd_ins_list(a):
         s = f"%{a.search.lower()}%"
         args += [f"%{norm_text(a.search)}%", s, s]
     out([dict(r) for r in con.execute(q + " ORDER BY rowid", args)])
+
+
+# ---------------------------------------------------------------- Agent 00 mirror
+AGENT00_DB = ROOT / "data" / "inspirations.sqlite3"
+PLATFORM_TO_SOURCE = {"instagram": "instagram", "pinterest": "pinterest", "youtube": "youtube", "other": "web"}
+
+
+def upsert_genre(con, name: str, origin: str = "discovered") -> tuple[str, bool]:
+    n = norm_text(name)
+    ex = con.execute("SELECT id FROM genres WHERE name_norm=?", (n,)).fetchone()
+    if ex:
+        return ex["id"], False
+    gid, t = next_id(con, "GEN"), now()
+    con.execute("INSERT INTO genres(id,name,name_norm,origin,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?)",
+                (gid, name.strip(), n, origin, "approved" if origin == "user" else "proposed", t, t))
+    return gid, True
+
+
+def sync_agent00(con, src: Path) -> dict:
+    """One-way mirror of Agent 00's catalog into the studio database. Never writes to `src`.
+    Safe to run repeatedly: unchanged records are skipped, analyses are stored once each."""
+    if not src.is_file():
+        raise StudioError(f"Agent 00 catalog not found at {src}. It is created by tools/inspiration.py on first use.")
+    acon = sqlite3.connect(f"file:{src}?mode=ro", uri=True)
+    acon.row_factory = sqlite3.Row
+    res = {"created": [], "linked_to_existing": [], "duplicates": [], "updated": [], "unchanged": 0,
+           "analyses_added": 0, "genres_added": [], "warnings": []}
+    for r in acon.execute("SELECT * FROM refs ORDER BY id"):
+        ref = f"REF-{r['id']:06d}"
+        m = con.execute("SELECT * FROM agent00_refs WHERE ref_id=?", (ref,)).fetchone()
+        t = now()
+        if m:
+            iid, dup = m["inspiration_id"], bool(m["is_duplicate"])
+            if m["source_updated_at"] == r["updated_at"]:
+                res["unchanged"] += 1
+                continue
+            res["updated"].append(ref)
+        else:
+            key = norm_url(r["url"])
+            ex = con.execute("SELECT inspiration_id FROM inspiration_links WHERE url_norm=?", (key,)).fetchone()
+            if ex:
+                iid = ex["inspiration_id"]
+                dup = bool(con.execute("SELECT 1 FROM agent00_refs WHERE inspiration_id=? AND is_duplicate=0",
+                                       (iid,)).fetchone())
+                if dup:
+                    res["duplicates"].append({"ref": ref, "same_post_as": iid, "url": r["url"]})
+                else:
+                    res["linked_to_existing"].append({"ref": ref, "inspiration": iid})
+            else:
+                iid, dup = next_id(con, "INS"), False
+                title = (r["title"] or "").strip() or r["url"]
+                con.execute("INSERT INTO inspirations(id,source_type,title,title_norm,created_at) VALUES(?,?,?,?,?)",
+                            (iid, PLATFORM_TO_SOURCE.get(r["platform"], "web"), title, norm_text(title), t))
+                con.execute("INSERT INTO inspiration_links VALUES(?,?,?)", (iid, r["url"], key))
+                res["created"].append({"ref": ref, "inspiration": iid})
+            con.execute("INSERT INTO agent00_refs(ref_id,inspiration_id,url,is_duplicate,first_synced_at,last_synced_at) "
+                        "VALUES(?,?,?,?,?,?)", (ref, iid, r["url"], int(dup), t, t))
+        analysis = (r["analysis_json"] or "").strip()
+        has_analysis = analysis not in ("", "{}")
+        if not dup:        # the first REF for a post is authoritative for its descriptive fields
+            meta = {k: r[k] for k in ("platform", "collection_name", "created_at", "updated_at")}
+            title = (r["title"] or "").strip() or r["url"]
+            con.execute("UPDATE inspirations SET title=?, title_norm=?, creator=?, notes=?, collection=?, "
+                        "access_status=?, source_meta_json=? WHERE id=?",
+                        (title, norm_text(title), r["creator"] or None, r["notes"] or None,
+                         r["collection_name"] or None, r["access_status"],
+                         json.dumps({"agent00": meta}, ensure_ascii=False), iid))
+        if has_analysis:
+            if record_analysis(con, iid, "agent00", r["access_status"], analysis,
+                               f"Agent 00 analysis of {ref} (access_status={r['access_status']})", ref):
+                res["analyses_added"] += 1
+            obj = json.loads(analysis)
+            claims = [x.get("name", "?") for x in obj.get("techniques", []) if x.get("certainty") == "observed"]
+            if r["access_status"] in ("blocked", "unreviewed") and claims:
+                res["warnings"].append(f"{ref}: marked '{r['access_status']}' but lists observed techniques "
+                                       f"{claims}. Nothing can be observed in a source that was not opened; review it.")
+            if not dup:
+                status = {"reviewed_video": "complete", "reviewed_images": "complete",
+                          "metadata_only": "partial"}.get(r["access_status"], "none")
+                con.execute("UPDATE inspirations SET analysis_json=?, analysis_basis=?, analysis_status=? WHERE id=?",
+                            (analysis, f"Agent 00, {ref}, access_status={r['access_status']}", status, iid))
+            for g in json.loads(r["genre_json"] or "[]"):
+                if isinstance(g, str) and g.strip():
+                    gid, made = upsert_genre(con, g)
+                    if made:
+                        res["genres_added"].append(g.strip())
+                    con.execute("INSERT OR IGNORE INTO inspiration_genres VALUES(?,?)", (iid, gid))
+        con.execute("UPDATE agent00_refs SET source_updated_at=?, last_synced_at=? WHERE ref_id=?",
+                    (r["updated_at"], t, ref))
+    acon.close()
+    res["mirrored_total"] = con.execute("SELECT COUNT(*) FROM agent00_refs").fetchone()[0]
+    return res
+
+
+def cmd_ins_sync(a):
+    con = connect()
+    res = sync_agent00(con, Path(a.db) if a.db else AGENT00_DB)
+    con.commit()
+    out({"ok": True, **res})
+
+
+# ---------------------------------------------------------------- reference shots (15-column manifest)
+MANIFEST_FIELDS = ("shot_id start_time end_time shot_size body_crop camera_angle camera_height composition "
+                   "model_movement camera_movement focal_length recording_settings actual_frame sketch "
+                   "confidence").split()
+
+
+def cmd_refshot_import(a):
+    """Import rows in the owner's 15-column format. Every row arrives PENDING_REVIEW."""
+    con = connect()
+    path = Path(a.file)
+    with path.open(newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        missing = [c for c in MANIFEST_FIELDS if c not in (reader.fieldnames or [])]
+        if missing:
+            raise StudioError(f"{path.name} is not in the shot manifest format; missing columns: {missing}")
+        rows = list(reader)
+    for table, val in (("inspirations", a.inspiration), ("assets", a.asset), ("projects", a.project)):
+        if val:
+            row(con, table, val)
+    added, skipped, unresolved = [], 0, []
+    for r in rows:
+        ref = (r.get("reference_id") or "").strip() or None
+        iid = a.inspiration
+        if ref and not iid:
+            m = con.execute("SELECT inspiration_id FROM agent00_refs WHERE ref_id=?", (ref,)).fetchone()
+            if m:
+                iid = m["inspiration_id"]
+            else:
+                unresolved.append(ref)
+        label = (r.get("candidate_label") or "").strip() or None
+        vals = [(r.get(c) or "").strip() for c in MANIFEST_FIELDS]
+        source_key = ref or a.inspiration or a.asset or path.name
+        # Agent 00 renumbers PROPOSED- ids on every export, so they are not part of the identity
+        ident = [source_key, label or ""] + (vals[1:] if vals[0].startswith("PROPOSED-") else vals)
+        h = hashlib.sha256(json.dumps(ident, ensure_ascii=False).encode()).hexdigest()
+        if con.execute("SELECT 1 FROM reference_shots WHERE row_hash=?", (h,)).fetchone():
+            skipped += 1
+            continue
+        rid = next_id(con, "RSH")
+        con.execute(
+            "INSERT INTO reference_shots(id,inspiration_id,ref_id,asset_id,project_id,source_label,candidate_label,"
+            + ",".join(MANIFEST_FIELDS) + ",row_hash,created_at) VALUES(" + ",".join("?" * (9 + len(MANIFEST_FIELDS))) + ")",
+            (rid, iid, ref, a.asset, a.project, path.name, label, *vals, h, now()))
+        added.append(rid)
+    con.commit()
+    out({"ok": True, "file": path.name, "rows": len(rows), "added": added, "already_present": skipped,
+         "unresolved_reference_ids": sorted(set(unresolved)),
+         "status": "PENDING_REVIEW — nothing joins the approved manifest until `refshot decide`"})
+
+
+def cmd_refshot_decide(a):
+    con = connect()
+    quote = (a.user_quote or "").strip()
+    if len(quote) < 2:
+        raise StudioError("--user-quote is required: the user's own words. Agents must not self-approve.")
+    shots = [row(con, "reference_shots", i) for i in a.shots]
+    for sh in shots:
+        if sh["approval_status"] != "PENDING_REVIEW":
+            raise StudioError(f"{sh['id']} is already {sh['approval_status']}; approved records are not changed")
+    t, status = now(), "approved" if a.approve else "rejected"
+    aid = next_id(con, "APR")
+    con.execute("INSERT INTO approvals(id,project_id,gate,subject_ref,summary,status,user_quote,requested_at,decided_at) "
+                "VALUES(?,?,?,?,?,?,?,?,?)",
+                (aid, None, "manifest_update", ",".join(a.shots), f"{len(shots)} reference shot(s)", status, quote, t, t))
+    for sh in shots:
+        con.execute("UPDATE reference_shots SET approval_status=?, approval_id=?, decided_at=? WHERE id=?",
+                    (status.upper(), aid, t, sh["id"]))
+    con.commit()
+    out({"ok": True, "shots": a.shots, "status": status.upper(), "approval": aid})
+
+
+def cmd_refshot_list(a):
+    con = connect()
+    q, args = ("SELECT id,inspiration_id,ref_id,candidate_label,shot_id,start_time,end_time,shot_size,"
+               "camera_movement,confidence,approval_status FROM reference_shots WHERE 1=1"), []
+    if a.status:
+        q += " AND approval_status=?"; args.append(a.status)
+    if a.inspiration:
+        q += " AND inspiration_id=?"; args.append(a.inspiration)
+    out([dict(r) for r in con.execute(q + " ORDER BY id", args)])
+
+
+def cmd_refshot_export(a):
+    """Write approved shots as a CSV with exactly the template's 15 columns. Never overwrites."""
+    con = connect()
+    dest = Path(a.file)
+    if dest.exists():
+        raise StudioError(f"{dest} already exists; choose a new filename (nothing is overwritten)")
+    rows = con.execute(f"SELECT {','.join(MANIFEST_FIELDS)} FROM reference_shots WHERE approval_status=? ORDER BY id",
+                       (a.status,)).fetchall()
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with dest.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(MANIFEST_FIELDS)
+        w.writerows([list(r) for r in rows])
+    out({"ok": True, "file": str(dest), "rows": len(rows), "status": a.status})
+
+
+def cmd_manifest_link(a):
+    con = connect()
+    row(con, "shot_manifest", a.technique)
+    row(con, "reference_shots", a.shot)
+    cur = con.execute("INSERT OR IGNORE INTO technique_shots VALUES(?,?,?)", (a.technique, a.shot, a.note))
+    con.commit()
+    out({"ok": True, "linked": cur.rowcount == 1, "technique": a.technique, "reference_shot": a.shot})
+
+
+def cmd_manifest_show(a):
+    con = connect()
+    t = dict(row(con, "shot_manifest", a.technique))
+    t["reference_shots"] = [dict(r) for r in con.execute(
+        "SELECT r.id,r.inspiration_id,r.ref_id,r.shot_id,r.start_time,r.end_time,r.approval_status,ts.note "
+        "FROM technique_shots ts JOIN reference_shots r ON r.id=ts.reference_shot_id "
+        "WHERE ts.technique_id=? ORDER BY r.id", (a.technique,))]
+    out(t)
 
 
 # ---------------------------------------------------------------- genres
@@ -665,6 +949,9 @@ def cmd_manifest_decide(a):
         con.execute("INSERT INTO shot_manifest(id,name,name_norm,category,spec_json,source_ref,approval_id,created_at) "
                     "VALUES(?,?,?,?,?,?,?,?)",
                     (sid, pr["name"], pr["name_norm"], pr["category"], pr["spec_json"], pr["source_ref"], aid, t))
+        if (pr["source_ref"] or "").startswith("RSH-") and con.execute(
+                "SELECT 1 FROM reference_shots WHERE id=?", (pr["source_ref"],)).fetchone():
+            con.execute("INSERT OR IGNORE INTO technique_shots VALUES(?,?,?)", (sid, pr["source_ref"], "source of the technique"))
     con.execute("UPDATE manifest_proposals SET status=?, manifest_id=?, decided_at=? WHERE id=?",
                 (status, sid, t, a.proposal))
     con.commit()
@@ -914,17 +1201,32 @@ def build_parser() -> argparse.ArgumentParser:
 
     g = group("ins", "inspiration library")
     p = add(g, "add", cmd_ins_add, "add a reference (duplicates are detected, not created)")
-    p.add_argument("--source", required=True, choices=["instagram", "pinterest", "web", "upload", "idea", "sheet"])
+    p.add_argument("--source", required=True, choices=["instagram", "pinterest", "youtube", "web", "upload", "idea", "sheet"])
     p.add_argument("--title", required=True); p.add_argument("--url", action="append")
     p.add_argument("--creator"); p.add_argument("--notes")
     p = add(g, "access", cmd_ins_access, "record whether the source could be opened")
-    p.add_argument("inspiration"); p.add_argument("--status", required=True, choices=["accessible", "inaccessible"])
-    p.add_argument("--detail")
+    p.add_argument("inspiration"); p.add_argument("--detail")
+    p.add_argument("--status", required=True,
+                   choices=["unreviewed", "blocked", "metadata_only", "reviewed_images", "reviewed_video"])
     p = add(g, "analysis", cmd_ins_analysis, "store analysis (refused unless the source was inspected)")
     p.add_argument("inspiration"); p.add_argument("--json", required=True); p.add_argument("--basis", required=True)
     p.add_argument("--status", default="complete", choices=["partial", "complete"])
     p = add(g, "show", cmd_ins_show, "show one"); p.add_argument("inspiration")
     p = add(g, "list", cmd_ins_list, "list / search"); p.add_argument("--search")
+    p = add(g, "sync-agent00", cmd_ins_sync, "mirror Agent 00's catalog into the studio database (one-way, repeatable)")
+    p.add_argument("--db", help="path to Agent 00's catalog (default data/inspirations.sqlite3)")
+
+    g = group("refshot", "reference shots in the 15-column manifest format")
+    p = add(g, "import", cmd_refshot_import, "import a manifest-format CSV as PENDING_REVIEW (repeatable)")
+    p.add_argument("file"); p.add_argument("--inspiration"); p.add_argument("--asset"); p.add_argument("--project")
+    p = add(g, "decide", cmd_refshot_decide, "record the user's decision on pending shots")
+    p.add_argument("shots", nargs="+"); m = p.add_mutually_exclusive_group(required=True)
+    m.add_argument("--approve", action="store_true"); m.add_argument("--reject", action="store_true")
+    p.add_argument("--user-quote", required=True)
+    p = add(g, "list", cmd_refshot_list, "list reference shots")
+    p.add_argument("--status", choices=["PENDING_REVIEW", "APPROVED", "REJECTED"]); p.add_argument("--inspiration")
+    p = add(g, "export", cmd_refshot_export, "write approved shots as a 15-column CSV (never overwrites)")
+    p.add_argument("file"); p.add_argument("--status", default="APPROVED", choices=["PENDING_REVIEW", "APPROVED", "REJECTED"])
 
     g = group("genre", "genre knowledge")
     p = add(g, "add", cmd_genre_add, "add a genre or tag inspirations with it")
@@ -942,6 +1244,9 @@ def build_parser() -> argparse.ArgumentParser:
     m.add_argument("--approve", action="store_true"); m.add_argument("--reject", action="store_true")
     p.add_argument("--user-quote", required=True)
     p = add(g, "list", cmd_manifest_list, "list entries"); p.add_argument("--proposals", action="store_true")
+    p = add(g, "link", cmd_manifest_link, "link a technique to a reference shot that shows it")
+    p.add_argument("technique"); p.add_argument("shot"); p.add_argument("--note")
+    p = add(g, "show", cmd_manifest_show, "a technique with its linked reference shots"); p.add_argument("technique")
 
     g = group("doc", "versioned concepts, storyboards, shot lists, specs")
     p = add(g, "add", cmd_doc_add, "add a new version (never edits an old one)")
@@ -999,7 +1304,7 @@ def main(argv=None) -> int:
     except StudioError as e:
         print(json.dumps({"ok": False, "error": str(e), **e.extra}, indent=2), file=sys.stderr)
         return e.code
-    except (sqlite3.Error, json.JSONDecodeError, OSError) as e:
+    except (sqlite3.Error, json.JSONDecodeError, OSError, csv.Error) as e:
         print(json.dumps({"ok": False, "error": f"{type(e).__name__}: {e}"}, indent=2), file=sys.stderr)
         return EXIT_ERROR
 

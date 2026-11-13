@@ -1,0 +1,16 @@
+{
+  "reference_id": "REF-000001",
+  "access_status": "reviewed_video",
+  "creator": "@example",
+  "title": "Optional verified title",
+  "genre": ["fantasy", "cinematic fashion"],
+  "story_summary": "Describe what was actually observed, not assumptions",
+  "techniques": [
+    {"name": "slow push-in", "timecode": "00:02-00:05", "evidence": "subject grows larger across sampled frames", "certainty": "observed", "recreation": "tripod slider or carefully stabilised walking movement"}
+  ],
+  "shot_candidates": [
+    {"label": "portal silhouette reveal", "shot_size": "WS", "body_crop": "full body", "camera_angle": "front", "camera_height": "eye", "composition": "centred portal", "model_movement": "step forward", "camera_movement": "locked", "confidence": "suggested"}
+  ],
+  "difficulty": "medium",
+  "notes": "Record any access limitations, missing audio or uncertain claims"
+}

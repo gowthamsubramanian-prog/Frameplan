@@ -1,4 +1,13 @@
 BEGIN TRANSACTION;
+CREATE TABLE agent00_refs (
+  ref_id         TEXT PRIMARY KEY,             -- REF-000001, stable
+  inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
+  url            TEXT NOT NULL,                -- original URL exactly as Agent 00 stored it
+  is_duplicate   INTEGER NOT NULL DEFAULT 0,   -- 1 = same post as an earlier REF
+  source_updated_at TEXT,                      -- Agent 00's updated_at at last sync
+  first_synced_at TEXT NOT NULL,
+  last_synced_at  TEXT NOT NULL
+);
 CREATE TABLE agent_runs (
   id         TEXT PRIMARY KEY,                 -- RUN-0001
   project_id TEXT REFERENCES projects(id),
@@ -91,9 +100,30 @@ CREATE TABLE genres (
   created_at  TEXT NOT NULL,
   updated_at  TEXT NOT NULL
 );
+INSERT INTO "genres" VALUES('GEN-0001','Cinematic fashion','cinematic fashion',NULL,NULL,'user','approved',1,'2026-11-13T06:46:42Z','2026-11-13T06:46:42Z');
+INSERT INTO "genres" VALUES('GEN-0002','Fantasy / surrealism','fantasy surrealism',NULL,NULL,'user','approved',1,'2026-11-13T06:46:42Z','2026-11-13T06:46:42Z');
+INSERT INTO "genres" VALUES('GEN-0003','Indian cultural aesthetics','indian cultural aesthetics',NULL,NULL,'user','approved',1,'2026-11-13T06:46:42Z','2026-11-13T06:46:42Z');
+INSERT INTO "genres" VALUES('GEN-0004','Emotional romance','emotional romance',NULL,NULL,'user','approved',1,'2026-11-13T06:46:42Z','2026-11-13T06:46:42Z');
+INSERT INTO "genres" VALUES('GEN-0005','Dark experimental','dark experimental',NULL,NULL,'user','approved',1,'2026-11-13T06:46:42Z','2026-11-13T06:46:42Z');
+INSERT INTO "genres" VALUES('GEN-0006','Creative VFX','creative vfx',NULL,NULL,'user','approved',1,'2026-11-13T06:46:42Z','2026-11-13T06:46:42Z');
+INSERT INTO "genres" VALUES('GEN-0007','Motion graphics / typography','motion graphics typography',NULL,NULL,'user','approved',1,'2026-11-13T06:46:42Z','2026-11-13T06:46:42Z');
+INSERT INTO "genres" VALUES('GEN-0008','Editing education / BTS','editing education bts',NULL,NULL,'user','approved',1,'2026-11-13T06:46:42Z','2026-11-13T06:46:42Z');
 CREATE TABLE id_counters (
   prefix TEXT PRIMARY KEY,
   next   INTEGER NOT NULL
+);
+INSERT INTO "id_counters" VALUES('GEN',9);
+CREATE TABLE inspiration_analyses (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
+  origin         TEXT NOT NULL CHECK (origin IN ('agent00','studio')),
+  ref_id         TEXT,                         -- Agent 00 REF- id the analysis was written against
+  access_status  TEXT NOT NULL,
+  basis          TEXT,
+  analysis_json  TEXT NOT NULL,
+  content_hash   TEXT NOT NULL,
+  recorded_at    TEXT NOT NULL,
+  UNIQUE (inspiration_id, content_hash)
 );
 CREATE TABLE inspiration_genres (
   inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
@@ -106,20 +136,22 @@ CREATE TABLE inspiration_links (
   url_norm       TEXT NOT NULL UNIQUE,         -- duplicate detection key
   PRIMARY KEY (inspiration_id, url)
 );
-CREATE TABLE inspirations (
+CREATE TABLE "inspirations" (
   id              TEXT PRIMARY KEY,            -- INS-0001
   source_type     TEXT NOT NULL CHECK (source_type IN
-                    ('instagram','pinterest','web','upload','idea','sheet')),
+                    ('instagram','pinterest','youtube','web','upload','idea','sheet')),
   title           TEXT NOT NULL,
   title_norm      TEXT NOT NULL,
   creator         TEXT,                        -- attribution, as given by the source
   notes           TEXT,                        -- the user's own words about why it was saved
-  access_status   TEXT NOT NULL DEFAULT 'not_attempted' CHECK (access_status IN
-                    ('not_attempted','accessible','inaccessible')),
-  access_detail   TEXT,                        -- e.g. "login wall", "HTTP 404"
+  collection      TEXT,                        -- saved-collection name, if any
+  -- Agent 00's five access states (references/analysis-schema.json)
+  access_status   TEXT NOT NULL DEFAULT 'unreviewed' CHECK (access_status IN
+                    ('unreviewed','blocked','metadata_only','reviewed_images','reviewed_video')),
+  access_detail   TEXT,                        -- e.g. "login wall", "network policy", "HTTP 404"
   analysis_status TEXT NOT NULL DEFAULT 'none' CHECK (analysis_status IN
                     ('none','partial','complete')),
-  analysis_json   TEXT,                        -- structured analysis; NULL until evidence exists
+  analysis_json   TEXT,                        -- latest analysis; full history in inspiration_analyses
   analysis_basis  TEXT,                        -- what was actually inspected
   source_meta_json TEXT,                       -- original row/metadata, preserved verbatim
   created_at      TEXT NOT NULL
@@ -141,8 +173,8 @@ CREATE TABLE meta (
   key   TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );
-INSERT INTO "meta" VALUES('schema_version','1');
 INSERT INTO "meta" VALUES('created_at','2026-11-13T04:47:52Z');
+INSERT INTO "meta" VALUES('schema_version','2');
 CREATE TABLE metrics (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   publication_id TEXT NOT NULL REFERENCES publications(id),
@@ -192,6 +224,26 @@ CREATE TABLE publications (
   url         TEXT,
   created_at  TEXT NOT NULL
 );
+CREATE TABLE reference_shots (
+  id              TEXT PRIMARY KEY,            -- RSH-0001
+  inspiration_id  TEXT REFERENCES inspirations(id),
+  ref_id          TEXT,                        -- Agent 00 REF- id, when the row came from Agent 00
+  asset_id        TEXT REFERENCES assets(id),
+  project_id      TEXT REFERENCES projects(id),
+  source_label    TEXT,                        -- file the row was imported from
+  candidate_label TEXT,
+  -- the 15 columns of SHOT_MANIFEST_TEMPLATE.csv, in order
+  shot_id TEXT, start_time TEXT, end_time TEXT, shot_size TEXT, body_crop TEXT,
+  camera_angle TEXT, camera_height TEXT, composition TEXT, model_movement TEXT,
+  camera_movement TEXT, focal_length TEXT, recording_settings TEXT, actual_frame TEXT,
+  sketch TEXT, confidence TEXT,
+  approval_status TEXT NOT NULL DEFAULT 'PENDING_REVIEW' CHECK (approval_status IN
+                    ('PENDING_REVIEW','APPROVED','REJECTED')),
+  approval_id     TEXT REFERENCES approvals(id),
+  row_hash        TEXT NOT NULL UNIQUE,        -- makes imports idempotent
+  created_at      TEXT NOT NULL,
+  decided_at      TEXT
+);
 CREATE TABLE shot_manifest (
   id          TEXT PRIMARY KEY,                -- SHT-0001
   name        TEXT NOT NULL,
@@ -221,7 +273,14 @@ CREATE TABLE stage_history (
   note       TEXT,
   at         TEXT NOT NULL
 );
+CREATE TABLE technique_shots (
+  technique_id      TEXT NOT NULL REFERENCES shot_manifest(id),
+  reference_shot_id TEXT NOT NULL REFERENCES reference_shots(id),
+  note              TEXT,
+  PRIMARY KEY (technique_id, reference_shot_id)
+);
 CREATE INDEX idx_docs_project ON documents(project_id, kind);
 CREATE INDEX idx_approvals_project ON approvals(project_id, gate);
 CREATE INDEX idx_insp_title ON inspirations(title_norm);
+CREATE INDEX idx_refshots_insp ON reference_shots(inspiration_id);
 COMMIT;

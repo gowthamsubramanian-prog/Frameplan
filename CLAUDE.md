@@ -1,8 +1,9 @@
 # Frameplan — Cinematic Content Studio
 
 A multi-agent production system that turns ideas, saved inspirations and reference footage
-into cinematic photo and video content. The owner shoots on a Sony A7 IV and edits in
-Premiere Pro, After Effects, DaVinci Resolve, CapCut, Lightroom and Photoshop.
+into cinematic photo and video content. The owner shoots on a Sony A7 IV with portrait lenses
+and portable lighting, and edits in Premiere Pro, After Effects (Beta), DaVinci Resolve (Free),
+CapCut, Lightroom and Photoshop.
 
 **Read `docs/IMPLEMENTATION_STATUS.md` first.** It says what is built, what is a draft and what
 is waiting on the owner. Do not describe anything as working unless that file or a test says so.
@@ -12,6 +13,13 @@ is waiting on the owner. Do not describe anything as working unless that file or
 - Any creative production request goes through the `studio` skill (the Master Studio Orchestrator).
 - State lives in the studio database. On a fresh checkout run `python3 studio/studio.py init`;
   it rebuilds from `data/studio.sql`. Write to it only through `studio/studio.py`.
+- **Reference intake and analysis belong to Agent 00** (`inspiration-intelligence` subagent and
+  skill, catalog tool `tools/inspiration.py`, catalog `data/inspirations.sqlite3`). The studio
+  database holds a one-way mirror: run `python3 studio/studio.py ins sync-agent00` after Agent 00
+  adds or analyses anything. Never write to Agent 00's catalog except through its own tool.
+- **Shot manifest:** individual reference shots use the owner's 15-column format
+  (`studio.py refshot …`); reusable techniques live in a separate library linked to those shots
+  (`studio.py manifest …`). Both change only through approved proposals.
 - Before committing, run `python3 studio/studio.py snapshot` and `python3 -m unittest discover -s tests`.
 
 ## Rules that do not bend
@@ -27,13 +35,46 @@ is waiting on the owner. Do not describe anything as working unless that file or
    filenames, timecodes, metrics, test results or integration capabilities.
 4. **Do not overwrite.** Documents are versioned; approved records are superseded, never edited.
    Original media is never modified. Keep original links and creator attribution.
-5. **Do not rebuild the owner's components.** Motion Director, Agent 00 (Inspiration
-   Intelligence), the Cinematic Reel Storyboard skill and the shot manifest template were
-   recovered and sit unaltered in `archive/recovery-pack-2026-11-13/`. They are not installed.
-   Migrate them only as approved in `docs/MIGRATION_REPORT.md`; never redesign or replace them.
-   No Creative Director file and no populated Master Shot Manifest were recovered.
+5. **Do not redesign the owner's components.** Motion Director, Cinematic Reel Storyboard and
+   Agent 00 (Inspiration Intelligence) are installed exactly as recovered; the originals are in
+   `archive/recovery-pack-2026-11-13/` and a test checks the installed copies still match.
+   Change them only with the owner's approval. No Creative Director is installed: a draft
+   specification is in `docs/drafts/` awaiting review. `frameplan-reference-analyser` and the
+   Frameplan app are separate things that have not been seen; do not assume either is Agent 00,
+   and do not modify Frameplan.
 6. **Motion graphics order:** research → proposal → idea approval → three styles with previews →
    style selection → production. Never show styles before the concept is approved.
+7. **Never bypass access controls.** No working around authentication, DRM, platform
+   restrictions or login walls, and never ask for passwords or session cookies. When a source
+   cannot be opened, say so and ask for an upload, screenshot or screen recording.
+8. **Do not integrate an untested specialist.** Each subagent is tested on its own, with a
+   logged result, before the orchestrator relies on it. `docs/IMPLEMENTATION_STATUS.md` records which have been.
+
+## Source discipline
+
+Label every observation about a reference with one of four certainties, and record the access status:
+
+| Label | Meaning |
+|---|---|
+| `observed` | Seen directly in the media that was opened (name the frame, timecode or file) |
+| `inferred` | Reasoned from what was seen, such as a camera move judged from two frames |
+| `suggested` | Your own recommendation, not a claim about the source |
+| `unverified` | Reported by someone or something else and not checked |
+
+Access status is one of `reviewed_video`, `reviewed_images`, `metadata_only`, `blocked`,
+`unreviewed`. Reading a link's page text or caption is `metadata_only`; it is never a video review.
+Use references to learn techniques and build original combinations, not to copy wholesale.
+
+## Creative context
+
+Starting genres, seeded in the genre library as owner-defined:
+cinematic fashion; fantasy/surrealism; Indian cultural aesthetics; emotional romance;
+dark experimental; creative VFX; motion graphics/typography; editing education/BTS.
+
+**These are a starting point, not a limit.** Research and discover further genres, techniques and
+production knowledge from references, projects and current practice, and add them to the genre
+library as proposals (`genre add`, or automatically through the Agent 00 mirror). Do not wait for
+the owner to define a genre before recognising one.
 
 ## Layout
 
@@ -48,10 +89,12 @@ is waiting on the owner. Do not describe anything as working unless that file or
 | `studio/video_probe.py` | Reference-video shot breakdown (ffmpeg) |
 | `studio/contracts.py` | JSON contracts between specialists |
 | `studio/adapters/` | Service adapters; Kling is dry-run only |
-| `.claude/agents/` | Subagents: `generation-director`, `qa-reviewer` |
+| `.claude/agents/` | Subagents: `inspiration-intelligence` (Agent 00), `generation-director`, `qa-reviewer` |
+| `.claude/skills/{motion-director,cinematic-reel-storyboard,inspiration-intelligence}/` | Owner's recovered skills, installed verbatim |
+| `tools/inspiration.py`, `references/` | Agent 00's catalog tool, analysis schema and sample import (verbatim) |
 | `archive/` | Unaltered recovered originals; nothing here is loaded |
 | `studio/config/studio.json` | Budgets, agent model choices, paid-tool pattern |
-| `data/` | `studio.sql` snapshot, Instagram state (`data/instagram/`) |
+| `data/` | `studio.sql` snapshot, Agent 00 catalog (`inspirations.sqlite3`), Instagram state (`data/instagram/`) |
 | `tests/` | Automated tests |
 | `docs/` | Status and handover documents |
 

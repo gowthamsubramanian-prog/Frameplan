@@ -268,8 +268,8 @@ class TestInspirationLibrary(StudioCase):
         i = self.ok("ins", "add", "--source", "instagram", "--title", "Private reel",
                     "--url", "https://www.instagram.com/reel/ABC123/")["id"]
         analysis = json.dumps({"lighting": "soft side light"})
-        self.blocked("ins", "analysis", i, "--json", analysis, "--basis", "guess")       # not attempted
-        self.ok("ins", "access", i, "--status", "inaccessible", "--detail", "login wall")
+        self.blocked("ins", "analysis", i, "--json", analysis, "--basis", "guess")       # unreviewed
+        self.ok("ins", "access", i, "--status", "blocked", "--detail", "login wall")
         err = self.blocked("ins", "analysis", i, "--json", analysis, "--basis", "guess")
         self.assertIn("actually inspected", err["error"])
         shown = self.ok("ins", "show", i)
@@ -278,7 +278,7 @@ class TestInspirationLibrary(StudioCase):
 
     def test_accessible_reference_stores_analysis_with_basis(self):
         i = self.ok("ins", "add", "--source", "upload", "--title", "Ref photo", "--creator", "@someone")["id"]
-        self.ok("ins", "access", i, "--status", "accessible", "--detail", "uploaded JPEG")
+        self.ok("ins", "access", i, "--status", "reviewed_images", "--detail", "uploaded JPEG")
         self.ok("ins", "analysis", i, "--json", json.dumps({"framing": "tight portrait"}),
                 "--basis", "uploads/ref.jpg viewed directly")
         s = self.ok("ins", "show", i)
