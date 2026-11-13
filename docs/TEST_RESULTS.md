@@ -1,7 +1,7 @@
 # Test results
 
 Run on 13 November 2026 with `python3 -m unittest discover -s tests -v`
-(Python 3.13, SQLite 3.53). **85 tests, 85 passed.**
+(Python 3.13, SQLite 3.53). **92 tests, 92 passed.**
 
 These tests cover the database tool, the workflow gates, the paid-generation hook script, the
 merged skills, the video breakdown script (on a synthetic clip built by ffmpeg), the agent
@@ -13,7 +13,7 @@ keeps IDs, URLs, creator, access status, certainty labels and analysis history, 
 duplicate links into one record; the 15-column manifest round-trips the owner's template exactly.
 
 Agent 00 was also run once on its own; that is a behavioural test, logged separately in
-`docs/tests/AGENT00_TEST_2026-11-13.md`, and is not part of the 85.
+`docs/tests/AGENT00_TEST_2026-11-13.md`, and is not part of the 92.
 
 They do not cover: any subagent actually running, analysis of real footage or real references,
 any live generation, or the hook firing inside a live session.
@@ -38,6 +38,12 @@ any live generation, or the hook firing inside a live session.
 ## Full output
 
 ```
+test_bad_input_is_a_clean_error_not_a_traceback [TestAgent00LocalFiles] ... ok
+test_import_accepts_files_and_reports_bad_rows_without_stopping [TestAgent00LocalFiles] ... ok
+test_links_behave_exactly_as_before [TestAgent00LocalFiles] ... ok
+test_local_file_analysis_mirrors_and_exports_with_its_true_source [TestAgent00LocalFiles] ... ok
+test_local_file_is_catalogued_without_inventing_a_url [TestAgent00LocalFiles] ... ok
+test_same_file_under_another_name_or_spelling_is_a_duplicate [TestAgent00LocalFiles] ... ok
 test_analysis_history_is_kept_when_agent00_revises [TestAgent00Mirror] ... ok
 test_blocked_reference_is_mirrored_as_blocked_with_no_analysis_status [TestAgent00Mirror] ... ok
 test_mirror_preserves_ids_urls_creator_access_and_certainty [TestAgent00Mirror] ... ok
@@ -58,6 +64,7 @@ test_old_database_is_refused_until_upgraded [TestSchemaUpgrade] ... ok
 test_upgrade_keeps_every_row_and_maps_access_states [TestSchemaUpgrade] ... ok
 test_agent00_definition_is_unchanged_and_has_no_model_pinned [TestVerbatimInstall] ... ok
 test_archive_still_matches_the_packs_own_checksums [TestVerbatimInstall] ... ok
+test_catalog_tool_original_is_preserved_and_the_change_is_declared [TestVerbatimInstall] ... ok
 test_installed_files_are_byte_identical_to_the_recovered_originals [TestVerbatimInstall] ... ok
 test_motion_director_gate_order_is_intact [TestVerbatimInstall] ... ok
 test_recovered_skills_have_their_original_names [TestVerbatimInstall] ... ok

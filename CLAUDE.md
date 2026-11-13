@@ -38,6 +38,8 @@ is waiting on the owner. Do not describe anything as working unless that file or
 5. **Do not redesign the owner's components.** Motion Director, Cinematic Reel Storyboard and
    Agent 00 (Inspiration Intelligence) are installed exactly as recovered; the originals are in
    `archive/recovery-pack-2026-11-13/` and a test checks the installed copies still match.
+   One approved exception: `tools/inspiration.py` was changed on 13 Nov 2026 so `add` and `import`
+   accept a local media file (stored as `file:<path>`, deduplicated by content hash).
    Change them only with the owner's approval. No Creative Director is installed: a draft
    specification is in `docs/drafts/` awaiting review. `frameplan-reference-analyser` and the
    Frameplan app are separate things that have not been seen; do not assume either is Agent 00,
@@ -91,7 +93,7 @@ the owner to define a genre before recognising one.
 | `studio/adapters/` | Service adapters; Kling is dry-run only |
 | `.claude/agents/` | Subagents: `inspiration-intelligence` (Agent 00), `generation-director`, `qa-reviewer` |
 | `.claude/skills/{motion-director,cinematic-reel-storyboard,inspiration-intelligence}/` | Owner's recovered skills, installed verbatim |
-| `tools/inspiration.py`, `references/` | Agent 00's catalog tool, analysis schema and sample import (verbatim) |
+| `tools/inspiration.py`, `references/` | Agent 00's catalog tool (one approved change: local files), analysis schema and sample import |
 | `archive/` | Unaltered recovered originals; nothing here is loaded |
 | `studio/config/studio.json` | Budgets, agent model choices, paid-tool pattern |
 | `data/` | `studio.sql` snapshot, Agent 00 catalog (`inspirations.sqlite3`), Instagram state (`data/instagram/`) |

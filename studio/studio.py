@@ -645,7 +645,8 @@ def cmd_ins_list(a):
 
 # ---------------------------------------------------------------- Agent 00 mirror
 AGENT00_DB = ROOT / "data" / "inspirations.sqlite3"
-PLATFORM_TO_SOURCE = {"instagram": "instagram", "pinterest": "pinterest", "youtube": "youtube", "other": "web"}
+PLATFORM_TO_SOURCE = {"instagram": "instagram", "pinterest": "pinterest", "youtube": "youtube", "other": "web",
+                      "local": "upload"}
 
 
 def upsert_genre(con, name: str, origin: str = "discovered") -> tuple[str, bool]:
@@ -679,7 +680,8 @@ def sync_agent00(con, src: Path) -> dict:
                 continue
             res["updated"].append(ref)
         else:
-            key = norm_url(r["url"])
+            # a local file is identified by its content hash, a link by its normalised form
+            key = r["url_key"] if r["platform"] == "local" else norm_url(r["url"])
             ex = con.execute("SELECT inspiration_id FROM inspiration_links WHERE url_norm=?", (key,)).fetchone()
             if ex:
                 iid = ex["inspiration_id"]

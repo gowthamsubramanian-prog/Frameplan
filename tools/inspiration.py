@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
-"""Offline, stdlib-only catalog. It never scrapes URLs or retrieves private collections."""
+"""Offline, stdlib-only catalog. It never scrapes URLs or retrieves private collections.
+
+Modified 13 Nov 2026 with the owner's approval: `add` and `import` also accept a path to a local
+media file (an upload or download with no known link). The original is kept unaltered in
+archive/recovery-pack-2026-11-13/.
+"""
 import argparse
 import csv
+import hashlib
 import json
 import re
 import sqlite3
@@ -27,6 +33,27 @@ def normalize(url):
     return urlunsplit(("https", host, parts.path.rstrip("/") or "/", query, ""))
 
 
+def local_source(value):
+    """A local media file: returns (stored reference, duplicate key) or None if `value` is not a file.
+
+    No URL is invented. The reference is `file:<path relative to the project>` and the duplicate
+    key is the file's SHA-256, so the same file under another name is recognised.
+    """
+    path = Path(value[5:] if value.startswith("file:") else value).expanduser()
+    if not path.is_file():
+        return None
+    digest = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            digest.update(chunk)
+    resolved = path.resolve()
+    try:
+        shown = resolved.relative_to(ROOT).as_posix()
+    except ValueError:
+        shown = resolved.as_posix()
+    return f"file:{shown}", f"sha256:{digest.hexdigest()}"
+
+
 def connect():
     DB.parent.mkdir(parents=True, exist_ok=True)
     db = sqlite3.connect(DB)
@@ -45,10 +72,15 @@ def connect():
 
 
 def add(db, item, collection=''):
-    url = item.get('url', '').strip()
-    key = normalize(url)
-    host = urlsplit(url).netloc.lower()
-    platform = 'instagram' if 'instagram.com' in host else 'pinterest' if 'pinterest.' in host or 'pin.it' in host else 'youtube' if 'youtube.' in host or 'youtu.be' in host else 'other'
+    url = (item.get('url') or '').strip()
+    local = None if url.lower().startswith(('http://', 'https://')) else local_source(url)
+    if local:
+        url, key = local
+        host = ''
+    else:
+        key = normalize(url)
+        host = urlsplit(url).netloc.lower()
+    platform = 'local' if local else 'instagram' if 'instagram.com' in host else 'pinterest' if 'pinterest.' in host or 'pin.it' in host else 'youtube' if 'youtube.' in host or 'youtu.be' in host else 'other'
     row = db.execute('SELECT id FROM refs WHERE url_key=?', (key,)).fetchone()
     if row:
         # Do not silently replace existing metadata or user's original notes.
@@ -66,7 +98,7 @@ def output(row):
 def main():
     p = argparse.ArgumentParser(description='Inspiration Intelligence catalog; no automatic scraping')
     sub = p.add_subparsers(dest='cmd',required=True)
-    a=sub.add_parser('add'); a.add_argument('url'); a.add_argument('--creator',default=''); a.add_argument('--title',default=''); a.add_argument('--notes',default=''); a.add_argument('--collection',default='')
+    a=sub.add_parser('add'); a.add_argument('url', help='an http(s) link, or the path of a local media file'); a.add_argument('--creator',default=''); a.add_argument('--title',default=''); a.add_argument('--notes',default=''); a.add_argument('--collection',default='')
     a=sub.add_parser('import'); a.add_argument('file'); a.add_argument('--collection',default='')
     a=sub.add_parser('analyse'); a.add_argument('file')
     a=sub.add_parser('search'); a.add_argument('query')
@@ -74,7 +106,11 @@ def main():
     a=sub.add_parser('export-shots'); a.add_argument('file')
     args=p.parse_args(); db=connect()
     if args.cmd=='add':
-        rid,created=add(db,vars(args)); print(f"REF-{rid:06d} {'added' if created else 'already exists'}")
+        try:
+            rid,created=add(db,vars(args))
+        except ValueError:
+            p.error(f"{args.url!r} is neither an http(s) link nor an existing local file")
+        print(f"REF-{rid:06d} {'added' if created else 'already exists'}")
     elif args.cmd=='import':
         path=Path(args.file)
         if path.suffix.lower()=='.csv':
@@ -83,11 +119,15 @@ def main():
             items=json.loads(path.read_text(encoding='utf-8'))
         else: p.error('Import requires CSV or JSON')
         if not isinstance(items,list): p.error('JSON must be an array')
-        created=0
+        created=0; invalid=[]
         for item in items:
             if isinstance(item,str): item={'url':item}
-            _,new=add(db,item,args.collection); created+=new
-        print(f"Imported {created} new; {len(items)-created} duplicates")
+            try:
+                _,new=add(db,item,args.collection); created+=new
+            except ValueError:
+                invalid.append(item.get('url',''))
+        print(f"Imported {created} new; {len(items)-created-len(invalid)} duplicates")
+        for bad in invalid: print(f"Skipped (neither an http(s) link nor an existing local file): {bad!r}")
     elif args.cmd=='analyse':
         obj=json.loads(Path(args.file).read_text(encoding='utf-8'))
         ridstr=obj.get('reference_id','')

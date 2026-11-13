@@ -27,7 +27,6 @@ INSTALLED = {
     ".claude/skills/cinematic-reel-storyboard/SKILL.md": ORIG / "Cinematic_Storyboard_SKILL_v2.md",
     ".claude/agents/inspiration-intelligence.md": A00 / ".claude/agents/inspiration-intelligence.md",
     ".claude/skills/inspiration-intelligence/SKILL.md": A00 / ".claude/skills/inspiration-intelligence/SKILL.md",
-    "tools/inspiration.py": A00 / "tools/inspiration.py",
     "references/analysis-schema.json": A00 / "references/analysis-schema.json",
     "references/import-example.csv": A00 / "references/import-example.csv",
 }
@@ -41,6 +40,12 @@ class TestVerbatimInstall(unittest.TestCase):
     def test_installed_files_are_byte_identical_to_the_recovered_originals(self):
         for rel, src in INSTALLED.items():
             self.assertEqual(sha(ROOT / rel), sha(src), rel)
+
+    def test_catalog_tool_original_is_preserved_and_the_change_is_declared(self):
+        # tools/inspiration.py was changed once, with the owner's approval, to accept local files
+        self.assertEqual(sha(A00 / "tools/inspiration.py"),
+                         "3abca174a226965601b22d1912869ee9bb3eab9777fa30c7b3a9177b53fecb33")
+        self.assertIn("Modified 13 Nov 2026 with the owner's approval", (ROOT / "tools/inspiration.py").read_text())
 
     def test_archive_still_matches_the_packs_own_checksums(self):
         lines = [l.split() for l in (PACK / "03_HANDOFF" / "SOURCE_CHECKSUMS.txt").read_text().splitlines()
@@ -344,3 +349,74 @@ class TestReferenceShotManifest(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestAgent00LocalFiles(Base):
+    """Approved change to tools/inspiration.py: local media files can be catalogued."""
+
+    def media(self, name, data=b"pretend video bytes"):
+        f = self.dir / "a00" / "media" / name
+        f.parent.mkdir(parents=True, exist_ok=True); f.write_bytes(data)
+        return f
+
+    def raw(self, *args):
+        return subprocess.run([sys.executable, str(self.dir / "a00" / "tools" / "inspiration.py"), *args],
+                              capture_output=True, text=True)
+
+    def row(self):
+        return dict(zip(("id", "url", "url_key", "platform"),
+                        sqlite3.connect(self.a00_db).execute("SELECT id,url,url_key,platform FROM refs").fetchone()))
+
+    def test_local_file_is_catalogued_without_inventing_a_url(self):
+        f = self.media("ref.mp4")
+        self.assertEqual(self.a00("add", str(f), "--title", "Downloaded reel", "--creator", ""), "REF-000001 added")
+        r = self.row()
+        self.assertEqual((r["url"], r["platform"]), ("file:media/ref.mp4", "local"))
+        self.assertEqual(r["url_key"], "sha256:" + hashlib.sha256(b"pretend video bytes").hexdigest())
+        self.assertNotIn("http", r["url"])
+        self.assertIn("creator unknown", self.a00("list"))
+
+    def test_same_file_under_another_name_or_spelling_is_a_duplicate(self):
+        f = self.media("ref.mp4"); copy = self.media("copy of ref.mov")
+        self.a00("add", str(f))
+        self.assertEqual(self.a00("add", str(copy)), "REF-000001 already exists")
+        self.assertEqual(self.a00("add", "file:" + str(f)), "REF-000001 already exists")
+        self.assertEqual(self.a00("add", str(self.media("other.mp4", b"different"))), "REF-000002 added")
+
+    def test_bad_input_is_a_clean_error_not_a_traceback(self):
+        for bad in ("media/missing.mp4", "", "ftp://example.com/x.mp4", str(self.dir)):
+            p = self.raw("add", bad)
+            self.assertEqual(p.returncode, 2, bad)
+            self.assertNotIn("Traceback", p.stderr)
+            self.assertIn("neither an http(s) link nor an existing local file", p.stderr)
+
+    def test_links_behave_exactly_as_before(self):
+        self.assertEqual(self.a00("add", "https://www.instagram.com/reel/ABC/?utm_source=x"), "REF-000001 added")
+        self.assertEqual(self.a00("add", "https://instagram.com/reel/ABC"), "REF-000001 already exists")
+        r = self.row()
+        self.assertEqual((r["url"], r["url_key"], r["platform"]),
+                         ("https://www.instagram.com/reel/ABC/?utm_source=x", "https://instagram.com/reel/ABC", "instagram"))
+
+    def test_import_accepts_files_and_reports_bad_rows_without_stopping(self):
+        f = self.media("ref.mp4")
+        c = self.dir / "mixed.csv"
+        c.write_text(f"url,title\n{f},Local clip\nhttps://www.pinterest.com/pin/1/,Pin\nnot-a-thing,Broken\n")
+        out = self.a00("import", str(c))
+        self.assertIn("Imported 2 new; 0 duplicates", out)
+        self.assertIn("Skipped", out); self.assertIn("not-a-thing", out)
+
+    def test_local_file_analysis_mirrors_and_exports_with_its_true_source(self):
+        f = self.media("ref.mp4")
+        self.a00("add", str(f), "--title", "Downloaded reel")
+        self.analyse("REF-000001", "reviewed_video", [{"name": "hard cut", "timecode": "00:02", "certainty": "observed"}],
+                     shots=[{"label": "veil lift", "shot_size": "CU", "confidence": "observed"}])
+        r = self.sync()
+        self.assertEqual(r["created"], [{"ref": "REF-000001", "inspiration": "INS-0001"}])
+        s = self.ok("ins", "show", "INS-0001")
+        self.assertEqual((s["source_type"], s["access_status"], s["links"]), ("upload", "reviewed_video", ["file:media/ref.mp4"]))
+        self.assertEqual(self.sync()["unchanged"], 1)
+        self.a00("add", str(self.media("renamed.mp4")))               # same bytes: Agent 00 already refuses it
+        self.assertEqual(self.sync()["mirrored_total"], 1)
+        e = self.dir / "p.csv"; self.a00("export-shots", str(e))
+        row = list(csv.DictReader(e.read_text().splitlines()))[0]
+        self.assertEqual((row["source_url"], row["reference_id"]), ("file:media/ref.mp4", "REF-000001"))

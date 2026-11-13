@@ -32,7 +32,8 @@ not exercised against real tools. **Blocked** = waiting on the owner. **Planned*
 
 ## Installed verbatim from the recovery pack
 
-Byte-identical to the originals in `archive/recovery-pack-2026-11-13/` (a test checks this).
+Byte-identical to the originals in `archive/recovery-pack-2026-11-13/` (a test checks this),
+except the catalog tool, changed once with the owner's approval.
 
 | Component | Path | State |
 |---|---|---|
@@ -40,14 +41,15 @@ Byte-identical to the originals in `archive/recovery-pack-2026-11-13/` (a test c
 | Cinematic Reel Storyboard v2.0 | `.claude/skills/cinematic-reel-storyboard/SKILL.md` | Installed; **never run**. Sketch, PDF and zip steps not built |
 | Agent 00 subagent | `.claude/agents/inspiration-intelligence.md` | Installed, unchanged, no model pinned. Not yet registered when tested; see below |
 | Agent 00 skill | `.claude/skills/inspiration-intelligence/SKILL.md` | Installed |
-| Agent 00 catalog tool | `tools/inspiration.py` | Installed; add, import, analyse, search, list and export-shots exercised by tests |
+| Agent 00 catalog tool | `tools/inspiration.py` | **Modified 13 Nov 2026 (approved):** `add` and `import` accept a local media file, stored as `file:<path>` and deduplicated by content hash; bad input gives a clean error. Link handling unchanged. Tested |
 | Analysis schema, sample import | `references/` | Installed |
 
 **Agent 00 test status:** one independent run on 13 November 2026
 (`docs/tests/AGENT00_TEST_2026-11-13.md`). Passed for a blocked link and for whole-file
 inspection of a local video. **Not yet tested on a real accessible reference**, and the run used
 a general-purpose agent following Agent 00's definition because the new agent type was not
-registered in that session. Known gap: its tool cannot catalogue a local file.
+registered in that session. The gap that run exposed (local files could not be catalogued) is
+fixed and tested at the tool level; Agent 00 itself has not been re-run since.
 
 Older editing drafts (v0.1/v0.2) stay in the archive only; see `docs/EDITING_DRAFTS_GAP_REVIEW.md`.
 
@@ -71,7 +73,7 @@ Older editing drafts (v0.1/v0.2) stay in the archive only; see `docs/EDITING_DRA
 
 One specialist at a time; each needs the owner's go-ahead and a logged test before the next.
 
-1. Agent 00: real-world test with an accessible reference; decide how local files are catalogued;
+1. Agent 00: real-world test with an accessible reference, run as the registered subagent;
    import the 16 rows from the "Shoot Planner & Inspiration" sheet.
 2. Storyboard: first run on a real reference video; build the local sketch, PDF and zip steps.
 3. Motion Director: first run to IDEA APPROVAL and three style previews.
@@ -96,7 +98,8 @@ One specialist at a time; each needs the owner's go-ahead and a logged test befo
 - No Instagram, Pinterest or OpenAI connector is available. Instagram publishing is manual.
 - This cloud environment's network refuses every outside host tested (Instagram, Pinterest,
   YouTube, Wikimedia, Pexels, archive.org). No link can be reviewed from here until hosts are allowed.
-- Agent 00's tool cannot catalogue a local file, cannot distinguish a network block from a login
-  wall, and its shot export never fills timecodes or frame names.
+- Agent 00's tool cannot distinguish a network block from a login wall, and its shot export never
+  fills timecodes or frame names. A local file's catalog entry points at its path; if the file is
+  moved or the session's container is discarded, the entry remains but the media is gone.
 - Agent 00's duplicate rule is looser than the studio's; the mirror folds duplicates into one
   record and reports them, but Agent 00's own catalog keeps both.
