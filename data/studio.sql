@@ -43,7 +43,8 @@ CREATE TABLE approvals (
 );
 INSERT INTO "approvals" VALUES('APR-0001',NULL,'manifest_update','RSH-0001,RSH-0002','2 reference shot(s)','approved',NULL,NULL,NULL,0,'1. Approve','2026-11-13T20:57:42Z','2026-11-13T20:57:42Z');
 INSERT INTO "approvals" VALUES('APR-0002','PRJ-0002','concept','DOC-0002','IDEA APPROVAL: The line that never stopped a forklift (30 s, three beats)','rejected',NULL,NULL,NULL,0,'STOP. Do not approve or continue the forklift safety concept. The test has failed its input relevance requirement.','2026-11-13T21:05:55Z','2026-11-13T21:10:33Z');
-INSERT INTO "approvals" VALUES('APR-0003','PRJ-0001','concept','DOC-0003,DOC-0004,DOC-0005','Choose one of three candle-portrait concepts: A Vigil, B The Candle-Bearer, C Offering','pending',NULL,NULL,NULL,0,NULL,'2026-11-13T21:11:33Z',NULL);
+INSERT INTO "approvals" VALUES('APR-0003','PRJ-0001','concept','DOC-0003,DOC-0004,DOC-0005','Choose one of three candle-portrait concepts: A Vigil, B The Candle-Bearer, C Offering','approved',NULL,NULL,NULL,0,'I accept the amendment, keep the items, approve concept A','2026-11-13T21:11:33Z','2026-11-13T21:35:44Z');
+INSERT INTO "approvals" VALUES('APR-0004','PRJ-0001','style','DOC-0006','Choose a style treatment for Vigil: 1 Ember, 2 Cold Hours, 3 Until Dawn','pending',NULL,NULL,NULL,0,NULL,'2026-11-13T21:35:44Z',NULL);
 CREATE TABLE assets (
   id           TEXT PRIMARY KEY,               -- AST-0001
   project_id   TEXT REFERENCES projects(id),
@@ -113,7 +114,7 @@ INSERT INTO "documents" VALUES('DOC-0002','PRJ-0002','motion_proposal','main',1,
 
 **Suggested duration:** 30 seconds.
 ','motion-director','2026-11-13T21:05:55Z');
-INSERT INTO "documents" VALUES('DOC-0003','PRJ-0001','concept','A',1,'draft','# Concept A — "Vigil"
+INSERT INTO "documents" VALUES('DOC-0003','PRJ-0001','concept','A',1,'approved','# Concept A — "Vigil"
 
 **Premise:** A woman keeps a night-long vigil. The candles she carries burn down as she waits, and the wax records the hours.
 **Story (stills series, or a 15–20 s reel):**
@@ -128,7 +129,7 @@ INSERT INTO "documents" VALUES('DOC-0003','PRJ-0001','concept','A',1,'draft','# 
 **Real-flame demands:** two or three sets of candles pre-cut to different heights so "time passing" is staged, not waited for; rigid shoulder base; hair tied back.
 **Difficulty:** medium.
 ','main session (Creative Director role not installed)','2026-11-13T21:11:33Z');
-INSERT INTO "documents" VALUES('DOC-0004','PRJ-0001','concept','B',1,'draft','# Concept B — "The Candle-Bearer"
+INSERT INTO "documents" VALUES('DOC-0004','PRJ-0001','concept','B',1,'rejected','# Concept B — "The Candle-Bearer"
 
 **Premise:** She is the candelabra. A figure who has stood holding the light for so long that the wax has grown over her like a garment; then, for a moment, she wakes.
 **Story (stills series, or a 12–15 s reel):**
@@ -143,7 +144,7 @@ INSERT INTO "documents" VALUES('DOC-0004','PRJ-0001','concept','B',1,'draft','# 
 **Real-flame demands:** the most prop work of the three: a bigger pre-built wax piece on a rigid base; long held poses near flame mean short takes, a seated or supported model and an assistant within reach.
 **Difficulty:** medium-hard.
 ','main session (Creative Director role not installed)','2026-11-13T21:11:33Z');
-INSERT INTO "documents" VALUES('DOC-0005','PRJ-0001','concept','C',1,'draft','# Concept C — "Offering"
+INSERT INTO "documents" VALUES('DOC-0005','PRJ-0001','concept','C',1,'rejected','# Concept C — "Offering"
 
 **Premise:** Light is passed, not kept. She lights one candle from another until the dark room is full of small flames, and the last one she lights is the one she wears.
 **Story (stills series, or a 15–20 s reel):**
@@ -158,6 +159,40 @@ INSERT INTO "documents" VALUES('DOC-0005','PRJ-0001','concept','C',1,'draft','# 
 **Real-flame demands:** the most open flame of the three: many candles on stable holders with clear floor around them, a taper for lighting, a fire blanket and extinguisher on set, hair tied back for the shoulder-lighting shot.
 **Difficulty:** medium.
 ','main session (Creative Director role not installed)','2026-11-13T21:11:33Z');
+INSERT INTO "documents" VALUES('DOC-0006','PRJ-0001','style_options','main',1,'draft','# Style treatments for Concept A "Vigil" (approved, DOC-0003)
+
+Reference boards are internal working material and are never published or included in final output.
+The catalog holds two references, so only treatments 1 and 2 have a reference behind them; treatment 3 has none.
+
+## 1 — Ember (reference: REF-000001, credited Cap2red Studio per watermark)
+- Mood: intimate, hushed, devotional.
+- Lighting: warm and low-key; a soft dimmed key motivated by the candles, with real flames as visible practicals.
+- Palette: amber skin against olive-black shadow; lifted matte blacks; cream wax; fine grain.
+- Composition: tight over-the-shoulder three-quarter profile, 4:5, shallow depth of field, blurred pillar candles behind.
+- Camera movement: very slow push-ins; otherwise still.
+- Editing: long holds joined by slow dissolves, each dissolve landing on shorter candles.
+- Trades away: distinctiveness (closest to the reference); an all-warm frame gives the candle shortening less contrast to read against.
+
+## 2 — Cold Hours (reference: REF-000002, creator unknown, probably AI-generated)
+- Mood: solitary, wakeful; the flame is the only warmth in a cold night.
+- Lighting: cool soft key with a small orange accent on the cheek and jaw nearest the flames.
+- Palette: teal-black background, true deep blacks, neutral-cool skin with one saturated orange area.
+- Composition: more negative space; face and flames on a diagonal; square-safe framing inside 4:5.
+- Camera movement: locked off, like a time-lapse position that never changes.
+- Editing: hard cuts between identical frames as time jumps; only the candles and her posture change.
+- Trades away: softness and warmth; needs a second, coloured light flagged tightly; a real photograph will look less neon than the reference.
+
+## 3 — Until Dawn (no reference in the catalog; a suggestion)
+- Mood: endurance giving way to release.
+- Lighting: begins candle-only and warm; cool pre-dawn light slowly enters from one side until daylight overtakes the flame.
+- Palette: amber and near-black at the start, moving to grey-blue with a small pale flame at the end.
+- Composition: starts close, ends wider with the edge of a window or room visible.
+- Camera movement: one slow pull-back across the piece.
+- Editing: fewest cuts; match dissolves on the same pose as the light changes.
+- Trades away: ease. Lighting continuity is the hardest of the three and needs a dimmable daylight source; no reference board can be shown for it.
+
+Recommended: 3, Until Dawn, because it is the only treatment where the look itself tells the vigil''s story (the light changes as the night passes). If its difficulty is not wanted, 1 is the safest to execute.
+','main session (Creative Director role not installed)','2026-11-13T21:35:44Z');
 CREATE TABLE gate_log (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   at         TEXT NOT NULL,
@@ -209,9 +244,9 @@ CREATE TABLE id_counters (
 INSERT INTO "id_counters" VALUES('GEN',10);
 INSERT INTO "id_counters" VALUES('INS',3);
 INSERT INTO "id_counters" VALUES('RSH',3);
-INSERT INTO "id_counters" VALUES('APR',4);
+INSERT INTO "id_counters" VALUES('APR',5);
 INSERT INTO "id_counters" VALUES('PRJ',3);
-INSERT INTO "id_counters" VALUES('DOC',6);
+INSERT INTO "id_counters" VALUES('DOC',7);
 CREATE TABLE inspiration_analyses (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   inspiration_id TEXT NOT NULL REFERENCES inspirations(id),

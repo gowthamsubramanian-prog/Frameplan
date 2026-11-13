@@ -232,8 +232,8 @@ could not open; relies on an untested specialist; or modifies the Frameplan app.
 ## 11a. Amendment 1 — input handling (added 14 November 2026, after sign-off)
 
 Added after the routing failure of 14 November. It restates rules the owner has since required
-and that are already active in `CLAUDE.md`, `studio/studio.py` and the hooks. **This amendment
-has not itself been signed off.**
+and that are already active in `CLAUDE.md`, `studio/studio.py` and the hooks. **Accepted by the owner on
+14 November 2026 ("I accept the amendment").**
 
 - The subject of any work is the owner's words, attachments and current project. The Creative
   Director never substitutes a sample or built-in topic, and never assumes a domain, audience or

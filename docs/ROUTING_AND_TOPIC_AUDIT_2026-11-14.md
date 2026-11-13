@@ -64,8 +64,11 @@ So fixing `route` alone could not fix the system. Three layers now cover it:
   own. The 14 November failure was exactly that kind of judgement. It is now caught at three
   earlier points (rows 10, 17, 19), but the last step is still a rule, not a lock.
 - **Slash-invoked skills** (rows 18, 23) never touch `route`.
-- **The three hooks have been tested as scripts but not observed firing in a live session**,
-  including the paid-generation hook from 13 November. This needs one check in a fresh session.
+- **Hook firing:** the context hook was observed firing live on the owner's next message
+  (14 November). The brief gate and the paid-generation hook have been tested as scripts but
+  not yet observed live.
+- **Decisions recorded 14 November:** the owner accepted the specification amendment and chose
+  to keep every item in the "found and deliberately kept" table.
 
 ## 2. Built-in topics: inventory and changes
 
