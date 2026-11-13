@@ -13,6 +13,32 @@ python3 studio/studio.py init                 # once per fresh checkout (safe to
 python3 studio/studio.py <group> --help       # every group is documented
 ```
 
+## 0. Input handling — read this before anything else
+
+The subject of the work is **what the owner supplied**: their words, their attachments, and the
+project they are in the middle of. Nothing else.
+
+1. **List the input first.** Words, attached images, attached videos, links, and any active
+   project (`project list`). Run `python3 studio/studio.py route "<their words>" --attachment <path> …`.
+2. **An attached image with little or no text is a visual creative reference.** Send it to
+   Agent 00 (`inspiration-intelligence`) for cataloguing and analysis. Check first whether it is
+   already catalogued (`tools/inspiration.py add <path>` answers "already exists").
+3. **Then, for a reference:** mirror the catalog, present what was observed separately from what
+   was inferred or suggested, develop **three** relevant photographic or cinematic concepts, and
+   stop at the concept approval. Only after approval, three tailored style treatments.
+4. **Never substitute a sample.** A skill's built-in example, a placeholder topic or a "typical"
+   subject is never used in place of the owner's input — not even for a test. If a specialist
+   needs a subject and none was given, use the active project's subject and say so, or ask.
+5. **No domain defaults.** Do not choose WHS/HSE, safety, LinkedIn or any other domain unless the
+   owner asked for it in this request. Motion Director's own defaults assume WHS and LinkedIn:
+   when calling it, always pass the owner's actual subject, `platform=` and the audience.
+6. **Carry the attachments through.** Whatever specialist is called receives the owner's files
+   and reference IDs in its brief. A specialist that was not given them has not been briefed.
+7. **If an attachment cannot be opened, say so and ask for it again.** Do not continue without it.
+8. **A named specialist does not change the subject.** "Test Motion Director" means test it on the
+   owner's material. If that specialist does not fit the material (Motion Director makes motion
+   graphics; it does not plan a photo shoot), say so and propose the right one before starting.
+
 ## 1. Start or resume
 
 1. `python3 studio/studio.py project list` — is this request about an existing project?

@@ -15,7 +15,7 @@ not exercised against real tools. **Blocked** = waiting on the owner. **Planned*
 | Technique library linked to reference shots (`manifest …`) | Working | Proposal-only until approved; links back to the shots that show each technique |
 | Genre library | Working | Seeded with the eight starting genres as owner-defined; grows through proposals and the mirror |
 | `studio/studio.py` (projects, approvals, inspirations, genres, manifest, documents, shots, prompts, generations, assets, runs, publishing, budget, snapshot) | Working | Tested |
-| Workflow routing A–E and stage gating | Working | `route` is a keyword heuristic; the orchestrator may override |
+| Workflow routing A–E and stage gating | Working | `route` reads attachments first, then words; an image with no prompt goes to Agent 00; no input is refused, never replaced by a sample. Fixed 14 Nov 2026 after a routing failure |
 | Approval checkpoints (concept, style, paid generation, export, publish, manifest, asset change) | Working | Style is refused before concept approval |
 | Paid-generation hook (`.claude/hooks/paid_gate.py`) | Working when invoked directly | Tested by piping hook payloads to the script. **Not yet observed firing inside a live Claude Code session**; confirm on the next session by attempting a Kling call without approval |
 | Budget limits (USD 10 per project, USD 100 per month) | Working | Based on the cost cap entered at approval; real Kling prices are not known |
@@ -38,7 +38,7 @@ except Agent 00's catalog tool, skill text and analysis schema, which carry appr
 
 | Component | Path | State |
 |---|---|---|
-| Motion Director | `.claude/skills/motion-director/SKILL.md` | **Test in progress** (`docs/tests/MOTION_DIRECTOR_TEST_2026-11-14.md`): phases 1–2 run and stopped at IDEA APPROVAL; phases 3–5 not yet run. Rendering needs Remotion or HyperFrames, neither verified |
+| Motion Director | `.claude/skills/motion-director/SKILL.md` | **No valid test yet.** Run 1 (14 Nov 2026) failed: the coordinator ran it on the skill's built-in example instead of the owner's material (`docs/tests/ROUTING_FAILURE_2026-11-14.md`). The skill itself is unchanged. Rendering needs Remotion or HyperFrames, neither verified |
 | Cinematic Reel Storyboard v2.0 | `.claude/skills/cinematic-reel-storyboard/SKILL.md` | Installed; **never run**. Sketch, PDF and zip steps not built |
 | Agent 00 subagent | `.claude/agents/inspiration-intelligence.md` | Installed, unchanged, no model pinned. Not yet registered when tested; see below |
 | Agent 00 skill | `.claude/skills/inspiration-intelligence/SKILL.md` | **Additions 13 Nov 2026 (approved):** local-file intake, `blocked_reason`, shot timecodes. Every original line kept |

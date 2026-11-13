@@ -1,4 +1,11 @@
-# Motion Director — test run 1
+# Motion Director — test run 1: FAILED (input relevance)
+
+> **Result: FAILED, 14 November 2026.** The run was made on the wrong subject. The owner had
+> uploaded candle-themed fashion portraits and was working on that shoot; the coordinator ran
+> the skill on its own built-in forklift example instead. The owner rejected the concept
+> (`APR-0002` rejected, `PRJ-0002` cancelled). Investigation, correction and retest:
+> `docs/tests/ROUTING_FAILURE_2026-11-14.md`. The checks below describe how the skill behaved on
+> the input it was given; they do not make the run a pass.
 
 14 November 2026. Run in the main session through the installed skill, unchanged.
 Project `PRJ-0002`; research ledger `DOC-0001`; idea proposal `DOC-0002`; approval `APR-0002`.

@@ -42,7 +42,8 @@ CREATE TABLE approvals (
   decided_at  TEXT
 );
 INSERT INTO "approvals" VALUES('APR-0001',NULL,'manifest_update','RSH-0001,RSH-0002','2 reference shot(s)','approved',NULL,NULL,NULL,0,'1. Approve','2026-11-13T20:57:42Z','2026-11-13T20:57:42Z');
-INSERT INTO "approvals" VALUES('APR-0002','PRJ-0002','concept','DOC-0002','IDEA APPROVAL: The line that never stopped a forklift (30 s, three beats)','pending',NULL,NULL,NULL,0,NULL,'2026-11-13T21:05:55Z',NULL);
+INSERT INTO "approvals" VALUES('APR-0002','PRJ-0002','concept','DOC-0002','IDEA APPROVAL: The line that never stopped a forklift (30 s, three beats)','rejected',NULL,NULL,NULL,0,'STOP. Do not approve or continue the forklift safety concept. The test has failed its input relevance requirement.','2026-11-13T21:05:55Z','2026-11-13T21:10:33Z');
+INSERT INTO "approvals" VALUES('APR-0003','PRJ-0001','concept','DOC-0003,DOC-0004,DOC-0005','Choose one of three candle-portrait concepts: A Vigil, B The Candle-Bearer, C Offering','pending',NULL,NULL,NULL,0,NULL,'2026-11-13T21:11:33Z',NULL);
 CREATE TABLE assets (
   id           TEXT PRIMARY KEY,               -- AST-0001
   project_id   TEXT REFERENCES projects(id),
@@ -92,7 +93,7 @@ on a reading of the document. Each must be checked against the source before any
 - **Not found:** a national count of pedestrians struck by forklifts. No statistic is used.
 - **Jurisdiction:** guidance cited is NSW and national model guidance; duties vary by state and are not stated as law in the video.
 ','motion-director','2026-11-13T21:05:54Z');
-INSERT INTO "documents" VALUES('DOC-0002','PRJ-0002','motion_proposal','main',1,'draft','# Idea proposal v1 — "Why forklift and pedestrian segregation matters"
+INSERT INTO "documents" VALUES('DOC-0002','PRJ-0002','motion_proposal','main',1,'rejected','# Idea proposal v1 — "Why forklift and pedestrian segregation matters"
 
 **Thesis:** Separation works when it does not depend on anyone paying attention: a barrier protects a distracted person, a painted line does not.
 
@@ -112,6 +113,51 @@ INSERT INTO "documents" VALUES('DOC-0002','PRJ-0002','motion_proposal','main',1,
 
 **Suggested duration:** 30 seconds.
 ','motion-director','2026-11-13T21:05:55Z');
+INSERT INTO "documents" VALUES('DOC-0003','PRJ-0001','concept','A',1,'draft','# Concept A — "Vigil"
+
+**Premise:** A woman keeps a night-long vigil. The candles she carries burn down as she waits, and the wax records the hours.
+**Story (stills series, or a 15–20 s reel):**
+1. Hook — a single flame is lit in darkness, close on hands.
+2. Reveal — the wax-laden shoulder with its lit candles; we see she is carrying the light herself.
+3. Hero — head back, eyes closed, fingertips at her lips: the stillest moment of the wait.
+4. Breath — eyes open, she looks down the shoulder at the flames; the candles are visibly shorter.
+5. Ending — she blows the last flame out; a thread of smoke, then dark. Works as a loop back to the lighting.
+**Drawn from the references (observed):** wax-dripped shoulder piece with two lit candles, chin-up eyes-closed pose with fingertips at the lips, over-the-shoulder three-quarter profile, blurred pillar candles behind (REF-000001); downcast gaze towards the shoulder flames (REF-000002).
+**Original to this concept (suggested):** the passage of time shown by candle height; the lighting and blowing-out bookends.
+**Deliverables:** 5–7 stills and one short reel from a single set.
+**Real-flame demands:** two or three sets of candles pre-cut to different heights so "time passing" is staged, not waited for; rigid shoulder base; hair tied back.
+**Difficulty:** medium.
+','main session (Creative Director role not installed)','2026-11-13T21:11:33Z');
+INSERT INTO "documents" VALUES('DOC-0004','PRJ-0001','concept','B',1,'draft','# Concept B — "The Candle-Bearer"
+
+**Premise:** She is the candelabra. A figure who has stood holding the light for so long that the wax has grown over her like a garment; then, for a moment, she wakes.
+**Story (stills series, or a 12–15 s reel):**
+1. Hook — extreme detail of wax and flame that reads as an object, not a person.
+2. Reveal — the frame widens: the "object" is a shoulder, a neck, a face held statue-still.
+3. Hero — perfect stillness in profile, eyes closed, as if carved; only the flames move.
+4. Breath — a finger lifts and touches the wax.
+5. Ending — her eyes open and meet the lens. Cut.
+**Drawn from the references (observed):** the mass of dripped wax worn on the shoulder like a garment (REF-000001); candles standing directly on the shoulder with wax running down the arm (REF-000002); hand entering frame towards the shoulder (REF-000001).
+**Original to this concept (suggested):** the object-to-person reveal; statue stillness broken by one small movement; a larger wax build extending to the collarbone and upper arm.
+**Deliverables:** 4–6 stills and one short reel.
+**Real-flame demands:** the most prop work of the three: a bigger pre-built wax piece on a rigid base; long held poses near flame mean short takes, a seated or supported model and an assistant within reach.
+**Difficulty:** medium-hard.
+','main session (Creative Director role not installed)','2026-11-13T21:11:33Z');
+INSERT INTO "documents" VALUES('DOC-0005','PRJ-0001','concept','C',1,'draft','# Concept C — "Offering"
+
+**Premise:** Light is passed, not kept. She lights one candle from another until the dark room is full of small flames, and the last one she lights is the one she wears.
+**Story (stills series, or a 15–20 s reel):**
+1. Hook — one flame touching an unlit wick; the second catches.
+2. Reveal — her face in the new light, eyes lowered to her hands.
+3. Hero — she lifts a lit taper to the candles on her own shoulder and lights them.
+4. Breath — hands lowered, eyes closed, the room now ringed with flames.
+5. Ending — a wide frame: one small figure among many lights.
+**Drawn from the references (observed):** hands as a leading element, and pillar candles as depth behind the subject (REF-000001); eyes lowered towards the flames, and a hand clasping the arm (REF-000002).
+**Original to this concept (suggested):** the act of lighting as the story; many candles rather than two; a closing wide frame, which neither reference has. It can be styled plainly or with cultural wardrobe of your choosing; that is your decision and nothing is assumed.
+**Deliverables:** 5–7 stills and one short reel.
+**Real-flame demands:** the most open flame of the three: many candles on stable holders with clear floor around them, a taper for lighting, a fire blanket and extinguisher on set, hair tied back for the shoulder-lighting shot.
+**Difficulty:** medium.
+','main session (Creative Director role not installed)','2026-11-13T21:11:33Z');
 CREATE TABLE gate_log (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   at         TEXT NOT NULL,
@@ -163,9 +209,9 @@ CREATE TABLE id_counters (
 INSERT INTO "id_counters" VALUES('GEN',10);
 INSERT INTO "id_counters" VALUES('INS',3);
 INSERT INTO "id_counters" VALUES('RSH',3);
-INSERT INTO "id_counters" VALUES('APR',3);
+INSERT INTO "id_counters" VALUES('APR',4);
 INSERT INTO "id_counters" VALUES('PRJ',3);
-INSERT INTO "id_counters" VALUES('DOC',3);
+INSERT INTO "id_counters" VALUES('DOC',6);
 CREATE TABLE inspiration_analyses (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
@@ -267,8 +313,8 @@ CREATE TABLE projects (
   created_at   TEXT NOT NULL,
   updated_at   TEXT NOT NULL
 );
-INSERT INTO "projects" VALUES('PRJ-0001','Candle portrait shoot','B','ingest','active','Candle-themed portrait shoot from two saved references (REF-000001, REF-000002). Owner decision 13 Nov 2026: use REAL candles, not LED with composited flames. Plan the prop, hair styling and safety measures around live flame. No source links or creators beyond the Cap2red Studio watermark on REF-000001.',NULL,10.0,'2026-11-13T20:57:42Z','2026-11-13T20:57:42Z');
-INSERT INTO "projects" VALUES('PRJ-0002','Why forklift and pedestrian segregation matters','E','proposal','active','Motion Director test run 1 (skill default path: WHS/HSE, LinkedIn, 9:16). Title chosen by Claude from the skill''s own example; owner may substitute.',NULL,10.0,'2026-11-13T21:05:54Z','2026-11-13T21:05:55Z');
+INSERT INTO "projects" VALUES('PRJ-0001','Candle portrait shoot','B','adaptation','active','Candle-themed portrait shoot from two saved references (REF-000001, REF-000002). Owner decision 13 Nov 2026: use REAL candles, not LED with composited flames. Plan the prop, hair styling and safety measures around live flame. No source links or creators beyond the Cap2red Studio watermark on REF-000001.',NULL,10.0,'2026-11-13T20:57:42Z','2026-11-13T21:11:33Z');
+INSERT INTO "projects" VALUES('PRJ-0002','Why forklift and pedestrian segregation matters','E','proposal','cancelled','Motion Director test run 1 (skill default path: WHS/HSE, LinkedIn, 9:16). Title chosen by Claude from the skill''s own example; owner may substitute.',NULL,10.0,'2026-11-13T21:05:54Z','2026-11-13T21:10:33Z');
 CREATE TABLE prompts (
   id         TEXT PRIMARY KEY,                 -- PRM-0001
   project_id TEXT NOT NULL REFERENCES projects(id),
@@ -349,6 +395,10 @@ INSERT INTO "stage_history" VALUES(1,'PRJ-0001',NULL,'ingest','project created',
 INSERT INTO "stage_history" VALUES(2,'PRJ-0002',NULL,'topic','project created','2026-11-13T21:05:54Z');
 INSERT INTO "stage_history" VALUES(3,'PRJ-0002','topic','research',NULL,'2026-11-13T21:05:54Z');
 INSERT INTO "stage_history" VALUES(4,'PRJ-0002','research','proposal',NULL,'2026-11-13T21:05:55Z');
+INSERT INTO "stage_history" VALUES(5,'PRJ-0002','proposal','proposal','status -> cancelled: Wrong input: coordinator substituted the skill''s built-in example title for the owner''s candle-portrait references. See docs/tests/MOTION_DIRECTOR_TEST_2026-11-14.md','2026-11-13T21:10:33Z');
+INSERT INTO "stage_history" VALUES(6,'PRJ-0001','ingest','analysis',NULL,'2026-11-13T21:11:33Z');
+INSERT INTO "stage_history" VALUES(7,'PRJ-0001','analysis','technique_extraction',NULL,'2026-11-13T21:11:33Z');
+INSERT INTO "stage_history" VALUES(8,'PRJ-0001','technique_extraction','adaptation',NULL,'2026-11-13T21:11:33Z');
 CREATE TABLE technique_shots (
   technique_id      TEXT NOT NULL REFERENCES shot_manifest(id),
   reference_shot_id TEXT NOT NULL REFERENCES reference_shots(id),

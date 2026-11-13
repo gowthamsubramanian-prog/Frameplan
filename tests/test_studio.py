@@ -106,6 +106,67 @@ class TestRouting(StudioCase):
         self.assertEqual((p["workflow"], p["stage"]), ("E", "topic"))
 
 
+class TestInputRouting(StudioCase):
+    """The owner's actual input decides the route. Regression for the 14 Nov 2026 failure, where
+    the coordinator ran a built-in forklift example instead of the uploaded candle portraits."""
+
+    def test_image_with_no_prompt_goes_to_agent00_as_a_reference(self):
+        r = self.ok("route", "--attachment", "media/incoming/1000162216.jpg")
+        self.assertEqual(r["workflow"], "B")
+        self.assertIn("inspiration-intelligence", r["first_specialist"])
+        self.assertEqual(r["input_detected"]["images"], ["media/incoming/1000162216.jpg"])
+        self.assertEqual(r["pass_to_specialist"], ["media/incoming/1000162216.jpg"])
+        self.assertIn("visual creative reference", r["rationale"])
+
+    def test_several_images_and_other_extensions_are_recognised(self):
+        r = self.ok("route", "--attachment", "a.PNG", "--attachment", "b.heic", "--attachment", "c.webp")
+        self.assertEqual((r["workflow"], len(r["input_detected"]["images"])), ("B", 3))
+
+    def test_no_input_is_an_error_not_a_sample_topic(self):
+        code, data = self.run_cli("route")
+        self.assertEqual(code, 1)
+        self.assertIn("Ask the owner", data["error"])
+        self.assertIn("Never substitute a sample", data["error"])
+
+    def test_route_never_proposes_a_domain(self):
+        for args in (["--attachment", "x.jpg"], ["a moody candlelit portrait series"], ["make a motion graphic"]):
+            r = self.ok("route", *args)
+            flat = json.dumps({k: v for k, v in r.items() if k != "rule"}).lower()
+            for word in ("forklift", "whs", "hse", "linkedin", "safety"):
+                self.assertNotIn(word, flat, (args, word))
+            self.assertIn("never assume WHS/HSE or LinkedIn", r["rule"])
+
+    def test_attachment_outranks_a_vague_prompt(self):
+        r = self.ok("route", "something like this", "--attachment", "ref.jpg")
+        self.assertEqual(r["workflow"], "B")
+
+    def test_explicit_motion_graphics_request_keeps_the_image_as_its_subject(self):
+        r = self.ok("route", "make a motion graphics piece from this", "--attachment", "ref.jpg")
+        self.assertEqual(r["workflow"], "E")
+        self.assertEqual(r["pass_to_specialist"], ["ref.jpg"])
+        self.assertIn("owner's actual subject", r["first_specialist"])
+
+    def test_video_reference_versus_own_footage(self):
+        r = self.ok("route", "--attachment", "clip.mp4")
+        self.assertEqual(r["workflow"], "C"); self.assertIsNotNone(r["needs_clarification"])
+        r = self.ok("route", "edit this, it is my footage from Saturday", "--attachment", "clip.mov")
+        self.assertEqual(r["workflow"], "A"); self.assertIn("rough-cut", r["rationale"])
+
+    def test_orchestrator_and_project_rules_forbid_sample_topics(self):
+        skill = (ROOT / ".claude/skills/studio/SKILL.md").read_text()
+        self.assertLess(skill.index("## 0. Input handling"), skill.index("## 1. Start or resume"))
+        for needle in ("Never substitute a sample", "No domain defaults", "Carry the attachments through",
+                       "A named specialist does not change the subject"):
+            self.assertIn(needle, skill)
+        self.assertIn("The owner's input is the subject", (ROOT / "CLAUDE.md").read_text())
+
+    def test_motion_director_itself_is_untouched(self):
+        import hashlib
+        a = (ROOT / ".claude/skills/motion-director/SKILL.md").read_bytes()
+        b = (ROOT / "archive/recovery-pack-2026-11-13/01_RESTORED_ORIGINALS/SKILL(1).md").read_bytes()
+        self.assertEqual(hashlib.sha256(a).hexdigest(), hashlib.sha256(b).hexdigest())
+
+
 class TestApprovalGates(StudioCase):
     def test_concept_gate_blocks_until_user_approves(self):
         pid = self.project("A")
@@ -336,6 +397,18 @@ class TestDocumentsAndResume(StudioCase):
                      "--subject", d2["document"])["approval"]["id"]
         self.ok("approval", "decide", a2, "--approve", "--user-quote", "v2 is better")
         self.assertEqual(self.ok("doc", "show", d1["document"])["status"], "superseded")
+
+    def test_choosing_one_of_three_concepts_approves_it_and_keeps_the_others_as_rejected(self):
+        pid = self.project("B")
+        docs = [self.ok("doc", "add", "--project", pid, "--kind", "concept", "--variant", v, "--content", v)["document"]
+                for v in "ABC"]
+        aid = self.ok("approval", "request", "--gate", "concept", "--project", pid, "--summary", "pick one",
+                      "--subject", ",".join(docs))["approval"]["id"]
+        code, _ = self.run_cli("approval", "decide", aid, "--approve", "--user-quote", "B", "--chosen", "DOC-9999")
+        self.assertEqual(code, 1)
+        self.ok("approval", "decide", aid, "--approve", "--user-quote", "I choose B", "--chosen", docs[1])
+        self.assertEqual([self.ok("doc", "show", d)["status"] for d in docs], ["rejected", "approved", "rejected"])
+        self.assertEqual(self.ok("doc", "show", docs[0])["content"], "A")       # unchosen concepts are kept
 
     def test_multiple_creative_variants_coexist(self):
         pid = self.project("A")

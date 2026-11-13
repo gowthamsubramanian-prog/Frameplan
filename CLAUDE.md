@@ -56,6 +56,11 @@ is waiting on the owner. Do not describe anything as working unless that file or
 9. **Reference boards stay internal.** Boards built from saved references exist only to help the
    owner choose a style. Never publish one, and never include a board or any image from one in
    a final output, caption, carousel or deliverable.
+10. **The owner's input is the subject.** Work on what the owner supplied — their words,
+    attachments and active project. An uploaded image with no prompt is a creative reference for
+    Agent 00. Never substitute a built-in example or sample topic, even for a test, and never
+    assume WHS/HSE or LinkedIn unless the owner asks for that domain. If the input is missing or
+    cannot be opened, ask for it.
 
 ## Source discipline
 

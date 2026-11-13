@@ -261,10 +261,58 @@ def route(text: str) -> dict:
     return {"workflow": "A", "name": WORKFLOWS["A"][0], "matched": None}
 
 
+IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif", ".gif", ".tif", ".tiff", ".bmp", ".arw", ".dng"}
+VIDEO_EXT = {".mp4", ".mov", ".m4v", ".mkv", ".avi", ".webm", ".mts", ".mxf"}
+FIRST_SPECIALIST = {
+    "A": "main session (concept development; search the inspiration catalog first)",
+    "B": "inspiration-intelligence (Agent 00): catalogue and analyse the reference",
+    "C": "inspiration-intelligence (Agent 00) with studio/video_probe.py: shot breakdown",
+    "D": "main session for the concept, then generation-director",
+    "E": "motion-director skill, given the owner's actual subject",
+}
+NO_DEFAULTS = ("The subject is whatever the owner supplied. Never substitute a sample, example or built-in "
+               "topic, and never assume WHS/HSE or LinkedIn unless the owner asked for that domain.")
+
+
+def route_request(text: str, attachments: list[str]) -> dict:
+    """Decide the workflow from what the owner actually supplied: attachments first, then words."""
+    text = (text or "").strip()
+    images = [p for p in attachments if Path(p).suffix.lower() in IMAGE_EXT]
+    videos = [p for p in attachments if Path(p).suffix.lower() in VIDEO_EXT]
+    other = [p for p in attachments if p not in images and p not in videos]
+    if not text and not attachments:
+        raise StudioError("No input to route. Ask the owner what they want made, or for the attachment. " + NO_DEFAULTS)
+    by_text = route(text) if text else None
+    explicit = by_text["workflow"] if by_text and by_text["matched"] else None
+    own_footage = bool(re.search(r"\b(my|our) (own )?(footage|clips?|rushes|takes)\b|\bi (shot|filmed)\b|\bedit (this|these|my)\b", text.lower()))
+    clarify = None
+    if videos and own_footage:
+        wf, why = "A", "the owner's own footage: enter at the rough-cut stage"
+    elif videos and explicit in ("D", "E"):
+        wf, why = explicit, f"the words ask for workflow {explicit}; the attached video is its subject or reference"
+    elif videos:
+        wf, why = "C", "a video was attached with no instruction to edit it: treat it as a reference to analyse"
+        clarify = "Confirm this is a reference to study, not the owner's own footage to edit."
+    elif images and explicit in ("D", "E"):
+        wf, why = explicit, f"the words ask for workflow {explicit}; the attached image is its subject or reference"
+    elif images:
+        wf, why = "B", "an image was attached: treat it as a visual creative reference"
+    elif by_text:
+        wf, why = by_text["workflow"], (f"matched '{by_text['matched']}'" if by_text["matched"] else
+                                         "no reference, footage or generation request: an original idea")
+    else:
+        wf, why = "B", "an attachment of unknown type: ask Agent 00 to identify it"
+        clarify = "Unrecognised file type; confirm what it is."
+    return {"workflow": wf, "name": WORKFLOWS[wf][0], "rationale": why,
+            "input_detected": {"text": text or None, "images": images, "videos": videos, "other_files": other},
+            "first_specialist": FIRST_SPECIALIST[wf],
+            "pass_to_specialist": attachments, "needs_clarification": clarify, "rule": NO_DEFAULTS}
+
+
 def cmd_route(a):
-    r = route(a.text)
+    r = route_request(a.text, a.attachment or [])
     r["stages"] = [{"stage": s, "requires_approval": g} for s, g in WORKFLOWS[r["workflow"]][1]]
-    r["note"] = "Keyword heuristic. The orchestrator may override it; say why when it does."
+    r["note"] = "Heuristic. The orchestrator may override it; say why when it does."
     out(r)
 
 
@@ -477,8 +525,16 @@ def cmd_approval_decide(a):
     status = "approved" if a.approve else "rejected"
     con.execute("UPDATE approvals SET status=?, user_quote=?, decided_at=? WHERE id=?",
                 (status, quote, now(), a.approval))
-    if ap["subject_ref"] and ap["subject_ref"].startswith("DOC-") and ap["gate"] in ("concept", "style", "export"):
-        _doc_set_status(con, ap["subject_ref"], status)
+    # --chosen names the one document the owner picked when several variants were offered
+    subject = a.chosen or ap["subject_ref"] or ""
+    if a.chosen and a.chosen not in (ap["subject_ref"] or "").split(","):
+        raise StudioError(f"{a.chosen} is not one of the documents this approval covers ({ap['subject_ref']})")
+    if re.fullmatch(r"DOC-\d+", subject) and ap["gate"] in ("concept", "style", "export"):
+        _doc_set_status(con, subject, status)
+        if a.chosen and status == "approved":
+            for other in (ap["subject_ref"] or "").split(","):
+                if other != a.chosen:
+                    con.execute("UPDATE documents SET status='rejected' WHERE id=? AND status='draft'", (other,))
     con.commit()
     out({"ok": True, "approval": as_dict(row(con, "approvals", a.approval))})
 
@@ -1167,8 +1223,9 @@ def build_parser() -> argparse.ArgumentParser:
     add(sub, "init", cmd_init, "create or upgrade the database (safe to repeat)")
     add(sub, "snapshot", cmd_snapshot, "write data/studio.sql for committing to git")
     add(sub, "workflows", cmd_workflows, "list workflows A–E with stages and gates")
-    p = add(sub, "route", cmd_route, "suggest a workflow for a natural-language request")
-    p.add_argument("text")
+    p = add(sub, "route", cmd_route, "choose a workflow from the owner's words and attachments")
+    p.add_argument("text", nargs="?", default="")
+    p.add_argument("--attachment", action="append", help="path of an uploaded file (repeatable)")
     p = add(sub, "budget", cmd_budget, "budget position")
     p.add_argument("--project")
 
@@ -1195,6 +1252,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("approval"); m = p.add_mutually_exclusive_group(required=True)
     m.add_argument("--approve", action="store_true"); m.add_argument("--reject", action="store_true")
     p.add_argument("--user-quote", required=True)
+    p.add_argument("--chosen", help="the document the owner picked, when the approval offered several variants")
     p = add(g, "list", cmd_approval_list, "list approvals")
     p.add_argument("--project"); p.add_argument("--pending", action="store_true")
 
