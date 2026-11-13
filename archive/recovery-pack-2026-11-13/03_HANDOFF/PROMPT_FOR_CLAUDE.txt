@@ -1,0 +1,12 @@
+AUDIT AND RECOVER MY EXISTING CLAUDE CODE CINEMATIC CONTENT STUDIO.
+
+I have supplied a recovery ZIP with original skill files and Agent 00. Do not install it blindly. Inspect this ZIP and my current repository/branches, including existing CLAUDE.md, Motion Director, reference analyser, existing editing skills, shot manifest, and any in-progress Agent 00 work.
+
+1. Inventory each artifact and its exact source path; distinguish installed, draft, prototype, missing and independently tested.
+2. Compare recovered files with current project versions and flag every conflict.
+3. Determine whether `frameplan-reference-analyser` already implements any Agent 00 functions, without assuming they are identical.
+4. Locate the actual Frameplan application repository, if accessible. If inaccessible, say so.
+5. Produce a migration plan that preserves all original work and honours the idea-then-style approval gates.
+6. Do NOT edit any existing files, run paid generation, or claim access to private Instagram/Pinterest collections. Await approval to merge.
+
+After the audit, help me develop the subagents individually and test them before building the master Creative Studio.

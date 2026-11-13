@@ -44,14 +44,18 @@ Where it helps, produce two or three variants (`doc add --variant A|B|C`) and le
 
 | Stage work | Specialist | Status |
 |---|---|---|
-| Reference ingestion and analysis, footage breakdown, genre discovery | `reference-analyst` subagent | not built yet — awaiting the user's Agent 00 files |
-| Concepts, creative direction, adaptation | `creative-director` subagent | not built yet — awaiting the user's Creative Director files |
+| Reference ingestion and analysis, genre discovery | the owner's Agent 00, `inspiration-intelligence` | recovered, archived, **not installed** — awaiting migration approval (`docs/MIGRATION_REPORT.md`) |
+| Reference-video shot breakdown | `python3 studio/video_probe.py <video> --out <new folder>`; the owner's `cinematic-reel-storyboard` skill for the full storyboard | script built and tested; storyboard skill recovered, not installed |
+| Concepts, creative direction, adaptation | `creative-director` subagent | not built — no original was recovered; needs the owner's approval to author |
 | Storyboard, shot list, cinematography, location and production plan | `shot-planner` subagent | not built yet |
-| Image and video prompts, generation specs | `generation-director` subagent; skills `ultra-realistic-portrait`, `navratri-photoshoot`, `kling-ai:*` | subagent not built yet; skills available |
-| Identity and quality review | `qa-reviewer` subagent | not built yet |
+| Generation specs and prompts | `generation-director` subagent; `python3 studio/adapters/kling.py plan` (dry run); skills `ultra-realistic-portrait`, `navratri-photoshoot`, `kling-ai:*` | built; not yet run on a real project |
+| Identity and quality review | `qa-reviewer` subagent | built; not yet run on a real output |
 | Edit | skills `rough-cut` → `colour-grading` → `effects-and-transitions` → `reel-assembly`, with `cinematic-reel-editing` as reference | available (instruction drafts; no editor control) |
-| Motion graphics production | the user's Motion Director | not in this repository — do not improvise a replacement |
+| Motion graphics production | the owner's `motion-director` skill | recovered, archived, **not installed** — awaiting migration approval. Do not improvise a replacement |
 | Scripts, captions, planning, audit | skills `ig-reel`, `ig-caption`, `ig-plan`, `ig-audit`, `ig-viral` and the other `ig-*` | available |
+
+Specialists exchange JSON documents defined in `studio/contracts.py`
+(`template` and `validate` for `generation_spec` and `qa_report`).
 
 Until a subagent exists, do that stage's work yourself in the main session and say so.
 Check `docs/IMPLEMENTATION_STATUS.md` for the current state before telling the user something works.

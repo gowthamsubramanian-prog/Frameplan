@@ -1,0 +1,28 @@
+{
+  "_source": "Kling connector `who_am_i` (tools=[image_to_video]), read on 11 November 2026, connector version 1.3.3, free (non-member) account.",
+  "_refresh": "Values change with membership tier and connector version. Re-read with the free `who_am_i` tool before relying on this file, and update it.",
+  "_prices": "The connector does not expose credit prices. No cost figures are known; never estimate them from this file.",
+  "account": {"membership": "NORMAL", "credits": 0, "checked": "2026-11-11"},
+  "tools": {
+    "image_to_video": {
+      "verified": true,
+      "mcp_tool": "mcp__kling-ai__image_to_video",
+      "default_model": "kling-video-v4_0",
+      "models": {
+        "kling-video-v2_5":       {"durations": [5, 10], "resolutions": ["720p"], "aspect_ratios": null, "inputs": ["first_image", "tail_image"], "required_inputs": ["first_image"], "max_duration": 10},
+        "kling-video-v2_6":       {"durations": [5, 10], "resolutions": ["720p"], "aspect_ratios": null, "inputs": ["first_image", "tail_image"], "required_inputs": ["first_image"], "max_duration": 10, "notes": "tail_image requires 1080p, which this account does not have"},
+        "kling-video-o1":         {"durations": [3, 4, 5, 6, 7, 8, 9, 10], "resolutions": ["720p"], "aspect_ratios": ["16:9", "9:16", "1:1"], "inputs": ["image_1", "image_2", "image_3", "image_4", "image_5", "image_6", "image_7"], "required_inputs": ["image_1"], "max_duration": 10},
+        "kling-video-v3_0_omni":  {"durations": "3-15", "resolutions": ["720p"], "aspect_ratios": ["16:9", "9:16", "1:1"], "inputs": ["image_1", "image_2", "image_3", "image_4", "image_5", "image_6", "image_7"], "required_inputs": ["image_1"], "max_duration": 15},
+        "kling-video-v3_0":       {"durations": "3-15", "resolutions": ["720p"], "aspect_ratios": null, "inputs": ["first_image", "tail_image"], "required_inputs": ["first_image"], "max_duration": 15},
+        "kling-video-v3_0_turbo": {"durations": "3-15", "resolutions": ["720p"], "aspect_ratios": null, "inputs": ["first_image"], "required_inputs": ["first_image"], "max_duration": 15},
+        "kling-video-v4_0":       {"durations": "3-30", "resolutions": ["720p"], "aspect_ratios": ["16:9", "9:16", "1:1", "21:9"], "inputs": ["first_image", "tail_image", "keyframe_1", "keyframe_2", "keyframe_3", "keyframe_4", "keyframe_5", "keyframe_6", "keyframe_7", "keyframe_8", "keyframe_9", "keyframe_10"], "required_inputs": [], "max_duration": 30, "notes": "omit aspect_ratio when a first frame is supplied unless the user asks"},
+        "kling-video-v4_0_flash": {"durations": "3-20", "resolutions": ["720p"], "aspect_ratios": ["16:9", "9:16", "1:1", "21:9"], "inputs": ["first_image"], "required_inputs": ["first_image"], "max_duration": 20}
+      }
+    },
+    "text_to_video":  {"verified": false, "mcp_tool": "mcp__kling-ai__text_to_video"},
+    "text_to_image":  {"verified": false, "mcp_tool": "mcp__kling-ai__text_to_image"},
+    "image_to_image": {"verified": false, "mcp_tool": "mcp__kling-ai__image_to_image"},
+    "motion_control": {"verified": false, "mcp_tool": "mcp__kling-ai__motion_control"},
+    "omni_ref_video": {"verified": false, "mcp_tool": "mcp__kling-ai__omni_ref_video"}
+  }
+}

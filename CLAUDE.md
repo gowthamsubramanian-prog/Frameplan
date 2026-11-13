@@ -28,9 +28,10 @@ is waiting on the owner. Do not describe anything as working unless that file or
 4. **Do not overwrite.** Documents are versioned; approved records are superseded, never edited.
    Original media is never modified. Keep original links and creator attribution.
 5. **Do not rebuild the owner's components.** Motion Director, Agent 00 (Inspiration
-   Intelligence), Creative Director and the Master Shot Manifest were developed elsewhere and
-   are not in this repository yet. Integrate them when supplied; do not improvise replacements
-   without approval.
+   Intelligence), the Cinematic Reel Storyboard skill and the shot manifest template were
+   recovered and sit unaltered in `archive/recovery-pack-2026-11-13/`. They are not installed.
+   Migrate them only as approved in `docs/MIGRATION_REPORT.md`; never redesign or replace them.
+   No Creative Director file and no populated Master Shot Manifest were recovered.
 6. **Motion graphics order:** research → proposal → idea approval → three styles with previews →
    style selection → production. Never show styles before the concept is approved.
 
@@ -44,6 +45,11 @@ is waiting on the owner. Do not describe anything as working unless that file or
 | `.claude/skills/ig-*/` | Instagram scripting, captions, planning, audit (third-party pack, MIT) |
 | `.claude/hooks/paid_gate.py`, `.claude/settings.json` | Paid-generation approval gate |
 | `studio/studio.py`, `studio/schema.sql` | Database tool and schema |
+| `studio/video_probe.py` | Reference-video shot breakdown (ffmpeg) |
+| `studio/contracts.py` | JSON contracts between specialists |
+| `studio/adapters/` | Service adapters; Kling is dry-run only |
+| `.claude/agents/` | Subagents: `generation-director`, `qa-reviewer` |
+| `archive/` | Unaltered recovered originals; nothing here is loaded |
 | `studio/config/studio.json` | Budgets, agent model choices, paid-tool pattern |
 | `data/` | `studio.sql` snapshot, Instagram state (`data/instagram/`) |
 | `tests/` | Automated tests |

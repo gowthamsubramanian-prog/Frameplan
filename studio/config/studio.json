@@ -7,7 +7,7 @@
   "models": {
     "_note": "Subagent model aliases accepted by Claude Code: fable, opus, sonnet, haiku. Do not depend on fable.",
     "orchestrator": "session",
-    "reference-analyst": "sonnet",
+    "inspiration-intelligence": "sonnet",
     "creative-director": "opus",
     "shot-planner": "sonnet",
     "generation-director": "sonnet",
