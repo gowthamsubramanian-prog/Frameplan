@@ -44,14 +44,14 @@ Where it helps, produce two or three variants (`doc add --variant A|B|C`) and le
 
 | Stage work | Specialist | Status |
 |---|---|---|
-| Reference ingestion and analysis, genre discovery | the owner's Agent 00, `inspiration-intelligence` | recovered, archived, **not installed** — awaiting migration approval (`docs/MIGRATION_REPORT.md`) |
-| Reference-video shot breakdown | `python3 studio/video_probe.py <video> --out <new folder>`; the owner's `cinematic-reel-storyboard` skill for the full storyboard | script built and tested; storyboard skill recovered, not installed |
-| Concepts, creative direction, adaptation | `creative-director` subagent | not built — no original was recovered; needs the owner's approval to author |
+| Reference ingestion and analysis, genre discovery | the owner's Agent 00: `inspiration-intelligence` subagent and skill, `tools/inspiration.py`. Then `studio.py ins sync-agent00` | installed verbatim; first test passed for blocked links and local video inspection; **cannot yet catalogue a local file**; not yet tested on a real accessible reference |
+| Reference-video shot breakdown | `python3 studio/video_probe.py <video> --out <new folder>`; the owner's `cinematic-reel-storyboard` skill for the full storyboard; `studio.py refshot import` for the 15-column shot list | script tested; storyboard skill installed verbatim, untested; its sketch, PDF and zip steps are not built |
+| Concepts, creative direction, adaptation | Creative Director | **not installed** — draft specification awaiting review in `docs/drafts/CREATIVE_DIRECTOR_SPEC.md` |
 | Storyboard, shot list, cinematography, location and production plan | `shot-planner` subagent | not built yet |
 | Generation specs and prompts | `generation-director` subagent; `python3 studio/adapters/kling.py plan` (dry run); skills `ultra-realistic-portrait`, `navratri-photoshoot`, `kling-ai:*` | built; not yet run on a real project |
 | Identity and quality review | `qa-reviewer` subagent | built; not yet run on a real output |
 | Edit | skills `rough-cut` → `colour-grading` → `effects-and-transitions` → `reel-assembly`, with `cinematic-reel-editing` as reference | available (instruction drafts; no editor control) |
-| Motion graphics production | the owner's `motion-director` skill | recovered, archived, **not installed** — awaiting migration approval. Do not improvise a replacement |
+| Motion graphics production | the owner's `motion-director` skill. Let it run its own phases; record its IDEA APPROVAL as `concept` and STYLE APPROVAL as `style`; pass `platform=` and audience when the topic is not WHS/HSE | installed verbatim, untested; Remotion and HyperFrames not verified |
 | Scripts, captions, planning, audit | skills `ig-reel`, `ig-caption`, `ig-plan`, `ig-audit`, `ig-viral` and the other `ig-*` | available |
 
 Specialists exchange JSON documents defined in `studio/contracts.py`
@@ -100,13 +100,16 @@ recommended styles with visual previews (plus "browse all") → style selection 
 
 ## 6. References and the manifest
 
-- `ins add` detects duplicates by link; the original link and creator are always kept.
-- Record whether the source could be opened: `ins access INS-… --status accessible|inaccessible`.
+- Agent 00 owns intake. After it adds or analyses anything, run `ins sync-agent00` (one-way, safe to repeat).
+  `ins add` remains for references Agent 00's tool cannot hold, such as an idea with no link.
+- Duplicates are detected by link; the original link, creator and `REF-` ID are always kept.
+- Access status uses Agent 00's five values: `ins access INS-… --status unreviewed|blocked|metadata_only|reviewed_images|reviewed_video`.
 - `ins analysis` is refused unless the source was actually inspected, and requires `--basis`
   stating what was inspected. For an inaccessible Instagram or Pinterest link, tell the user and
   ask for an upload, screenshot or screen recording. Never describe content you could not see.
-- New techniques go to `manifest propose`. Only `manifest decide` with the user's words adds
-  them to the manifest.
+- Shots from a reference video go in as `refshot import <15-column csv>` and stay PENDING_REVIEW
+  until `refshot decide`. Reusable techniques go to `manifest propose --source RSH-…`; only
+  `manifest decide` with the user's words adds them, and the technique is then linked to its shot.
 
 ## 7. When something fails
 

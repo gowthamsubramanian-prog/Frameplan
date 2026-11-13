@@ -1,0 +1,22 @@
+{
+  "reference_id": "UNASSIGNED - tools/inspiration.py add rejects non-HTTP(S) sources, so this local file has no catalog ID and this analysis has NOT been saved to the catalog",
+  "local_file": "media/incoming/downloaded_reference.mp4",
+  "sha256": "84775d2c9acab51afd5a7314583e67f58b9d6a707456e7089bbf8b07aabc6b20",
+  "source_url": "unknown (owner no longer has the link)",
+  "access_status": "reviewed_video",
+  "creator": "",
+  "title": "",
+  "genre": [],
+  "story_summary": "Whole 5.000 s file reviewed (25 frames sampled at 5 fps, plus start/middle/end frames of each segment, plus the audio track). It contains no photographed footage: no person, no set, no lighting, no camera work. It is three synthetic segments joined by hard cuts: 00:00.000-00:02.000 a colour-bar test pattern with a scrolling hue strip and an on-screen counter reading 0 then 1; 00:02.000-00:03.520 a Mandelbrot fractal with a slow continuous zoom; 00:03.520-00:05.000 a flat, uniform red frame. Audio is a constant tone of about 440 Hz for the full duration. 540x960, 9:16, 25 fps, H.264 + AAC mono; container encoder tag Lavf60.16.100 / Lavc60.31.102 libx264.",
+  "techniques": [
+    {"name": "hard cut", "timecode": "00:02.000", "evidence": "ffmpeg scene score 0.646 at pts 2.000; frame at 00:01.800 is colour bars, frame at 00:02.000 is the fractal", "certainty": "observed", "recreation": "plain cut; nothing specific to recreate"},
+    {"name": "hard cut", "timecode": "00:03.520", "evidence": "ffmpeg scene score 0.481 at pts 3.520; frame at 00:03.400 is the fractal, frame at 00:03.600 is flat red", "certainty": "observed", "recreation": "plain cut; nothing specific to recreate"},
+    {"name": "slow continuous zoom-in on a generated fractal", "timecode": "00:02.000-00:03.520", "evidence": "fractal features grow and drift right across the eight sampled frames 00:02.000-00:03.400", "certainty": "observed", "recreation": "not a camera move; it is computer-generated animation"},
+    {"name": "flat single-colour frame", "timecode": "00:03.520-00:05.000", "evidence": "all 37 frames have identical luma min = max = average (81) and constant chroma", "certainty": "observed", "recreation": "a colour solid in any editor"},
+    {"name": "constant ~440 Hz tone", "timecode": "00:00-00:05", "evidence": "zero-crossing count gives 439.5-440 Hz in each of the five seconds; level steady at about -21 dB RMS", "certainty": "observed", "recreation": "tone generator; not a creative sound choice"},
+    {"name": "file is an ffmpeg-generated test clip (testsrc, mandelbrot and colour sources with a sine tone), not a creator's video", "timecode": "00:00-00:05", "evidence": "the three pictures match ffmpeg's built-in test sources and the encoder tags are Lavf/Lavc; how the file reached the owner is not known", "certainty": "inferred", "recreation": "none"}
+  ],
+  "shot_candidates": [],
+  "difficulty": "",
+  "notes": "No shot candidates: there is no subject, framing, lighting or camera movement in the file to propose a shot from. Probably the wrong file, a placeholder, or a failed download. Origin link and creator unknown and not guessed. Frames: media/work/downloaded_reference_breakdown/ (studio/video_probe.py) and media/work/downloaded_reference_agent00/sheet_5fps.jpg."
+}

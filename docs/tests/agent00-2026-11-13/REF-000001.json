@@ -1,0 +1,12 @@
+{
+  "reference_id": "REF-000001",
+  "access_status": "blocked",
+  "creator": "",
+  "title": "",
+  "genre": [],
+  "story_summary": "",
+  "techniques": [],
+  "shot_candidates": [],
+  "difficulty": "",
+  "notes": "NOT REVIEWED. Nothing from this post was opened on 2026-11-13: no page text, caption, image or video. WebFetch of https://www.instagram.com/p/DdlYkrlFHIk/ failed with 'getaddrinfo ENOTFOUND www.instagram.com'; curl failed with 'CONNECT tunnel failed, response 403' (the session's egress proxy refused www.instagram.com:443, i.e. the host is not allowed for this session; the request never reached Instagram, so whether the post is public or behind a login is unknown). Creator, title, media type (photo, carousel or reel) and all lighting details are unknown. No techniques or shot candidates are recorded because nothing was seen. Owner's question (how the subject is lit and separated from the darker background) remains open. To review: owner to supply a screenshot/downloaded image, or a screen recording if it is a reel, plus the creator handle."
+}

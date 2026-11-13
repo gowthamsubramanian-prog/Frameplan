@@ -1,8 +1,14 @@
 # Migration and integration report — Recovery Pack
 
-Prepared 13 November 2026. Status: **proposal, awaiting the owner's decisions in section 7.**
-Nothing from the pack has been installed. The pack is stored unaltered in
-`archive/recovery-pack-2026-11-13/`, where nothing is loaded by Claude Code.
+Prepared 13 November 2026.
+
+> **Update, same day:** the owner approved decisions 1 to 5. The recovered files were installed
+> verbatim, the one-way mirror and the 15-column manifest were built, and `CLAUDE.md` was merged.
+> Decision 5 was to leave Agent 00's file unchanged (no model pinned). The Creative Director is a
+> draft in `docs/drafts/`. Current state: `docs/IMPLEMENTATION_STATUS.md`. The text below is the
+> proposal as originally written.
+
+The pack is stored unaltered in `archive/recovery-pack-2026-11-13/`, where nothing is loaded by Claude Code.
 
 ## 1. What was received
 
