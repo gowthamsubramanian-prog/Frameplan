@@ -38,7 +38,7 @@ except Agent 00's catalog tool, skill text and analysis schema, which carry appr
 
 | Component | Path | State |
 |---|---|---|
-| Motion Director | `.claude/skills/motion-director/SKILL.md` | Installed; **never run**. Rendering needs Remotion or HyperFrames, neither verified |
+| Motion Director | `.claude/skills/motion-director/SKILL.md` | **Test in progress** (`docs/tests/MOTION_DIRECTOR_TEST_2026-11-14.md`): phases 1–2 run and stopped at IDEA APPROVAL; phases 3–5 not yet run. Rendering needs Remotion or HyperFrames, neither verified |
 | Cinematic Reel Storyboard v2.0 | `.claude/skills/cinematic-reel-storyboard/SKILL.md` | Installed; **never run**. Sketch, PDF and zip steps not built |
 | Agent 00 subagent | `.claude/agents/inspiration-intelligence.md` | Installed, unchanged, no model pinned. Not yet registered when tested; see below |
 | Agent 00 skill | `.claude/skills/inspiration-intelligence/SKILL.md` | **Additions 13 Nov 2026 (approved):** local-file intake, `blocked_reason`, shot timecodes. Every original line kept |
@@ -62,7 +62,7 @@ Older editing drafts (v0.1/v0.2) stay in the archive only; see `docs/EDITING_DRA
 
 | Document | Purpose |
 |---|---|
-| `docs/drafts/CREATIVE_DIRECTOR_SPEC.md` | Creative Director specification v1.0, final for the owner's sign-off. Not installed, not active. Implementation is deferred until the dependent specialists pass their tests |
+| `docs/drafts/CREATIVE_DIRECTOR_SPEC.md` | Creative Director specification v1.0, **signed off by the owner on 14 Nov 2026**. Not installed, not active. Implementation is deferred until the dependent specialists pass their tests |
 
 ## Still missing
 

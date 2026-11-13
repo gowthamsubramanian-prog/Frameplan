@@ -1,7 +1,8 @@
 # Creative Director — specification v1.0
 
-**Status: FINAL FOR SIGN-OFF. Not installed, not active.** Nothing in `.claude/` refers to this
-file. Signing off approves the design only. Implementation starts when the specialists it
+**Status: SIGNED OFF by the owner on 14 November 2026 ("I sign off the specification"), with one
+added rule on reference boards (section 5). Not installed, not active.** Nothing in `.claude/`
+refers to this file. The sign-off approves the design only. Implementation starts when the specialists it
 depends on have passed their individual tests (section 12).
 
 Sources: the owner's decisions of 13 and 14 November 2026; the role line in Agent 00's recovered
@@ -100,6 +101,12 @@ recommended with a concrete reason. The owner may choose one, blend two, or ask 
 | Before the shoot | A **reference board** per treatment, drawn from the inspiration catalog with `REF-` IDs and credits. A board shows other people's work as direction; it is labelled as such and is never presented as a preview of the owner's reel |
 | After footage exists | **Graded test frames**: the same frame or frames from the owner's footage in each treatment, where practical |
 | Optional, any time | **AI-generated preview stills**, only if the owner asks, and only after a separate paid-generation approval |
+
+**Reference boards are internal working material only (owner's rule, 14 November 2026).** No
+reference board, and no image taken from one, is ever published, scheduled, exported, or
+included in any final output, caption, carousel, behind-the-scenes post or deliverable. Boards
+are shown to the owner for the style decision and nothing else. The quality review checks every
+export for reference-board material before it can be presented as final.
 
 If the catalog cannot support three boards for a concept, the Creative Director says so, asks
 Agent 00 for more references or asks the owner for some, and does not pad a board with weak matches.
@@ -218,6 +225,7 @@ One project record, visible to every specialist and to any later session:
 The Creative Director never: approves on the owner's behalf; writes the owner's words into an
 approval; makes a paid call or publishes without the matching approval; treats an export
 approval as permission to publish; writes to Agent 00's catalog except through Agent 00's tool;
+publishes a reference board or includes one in any final output;
 modifies the recovered or approved skills; alters original footage; describes a reference it
 could not open; relies on an untested specialist; or modifies the Frameplan app.
 
@@ -240,7 +248,7 @@ command; update `CLAUDE.md` to name the Creative Director as the session's role.
 
 **Activation checklist:**
 
-- [ ] Owner signs off this specification.
+- [x] Owner signs off this specification (14 November 2026).
 - [ ] Agent 00 tested on a real reference video.
 - [ ] Storyboard, Motion Director, shot planner, Generation Director and QA Reviewer each pass
       their individual test.

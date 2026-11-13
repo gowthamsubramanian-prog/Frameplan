@@ -53,6 +53,9 @@ is waiting on the owner. Do not describe anything as working unless that file or
    cannot be opened, say so and ask for an upload, screenshot or screen recording.
 8. **Do not integrate an untested specialist.** Each subagent is tested on its own, with a
    logged result, before the orchestrator relies on it. `docs/IMPLEMENTATION_STATUS.md` records which have been.
+9. **Reference boards stay internal.** Boards built from saved references exist only to help the
+   owner choose a style. Never publish one, and never include a board or any image from one in
+   a final output, caption, carousel or deliverable.
 
 ## Source discipline
 

@@ -42,6 +42,7 @@ CREATE TABLE approvals (
   decided_at  TEXT
 );
 INSERT INTO "approvals" VALUES('APR-0001',NULL,'manifest_update','RSH-0001,RSH-0002','2 reference shot(s)','approved',NULL,NULL,NULL,0,'1. Approve','2026-11-13T20:57:42Z','2026-11-13T20:57:42Z');
+INSERT INTO "approvals" VALUES('APR-0002','PRJ-0002','concept','DOC-0002','IDEA APPROVAL: The line that never stopped a forklift (30 s, three beats)','pending',NULL,NULL,NULL,0,NULL,'2026-11-13T21:05:55Z',NULL);
 CREATE TABLE assets (
   id           TEXT PRIMARY KEY,               -- AST-0001
   project_id   TEXT REFERENCES projects(id),
@@ -68,6 +69,49 @@ CREATE TABLE documents (
   created_at TEXT NOT NULL,
   UNIQUE (project_id, kind, variant, version)
 );
+INSERT INTO "documents" VALUES('DOC-0001','PRJ-0002','research','main',1,'draft','# Research ledger — "Why forklift and pedestrian segregation matters"
+
+Researched 14 November 2026 by web search. **Limitation:** this session''s network blocks outside
+hosts, so no source document was opened. Every entry below rests on search-result excerpts, not
+on a reading of the document. Each must be checked against the source before anything is rendered.
+
+| # | Claim | Source | Confidence | On screen as |
+|---|---|---|---|---|
+| 1 | The best way to make sure people are not hit by a forklift is to keep them away from forklifts using physical barriers such as guardrails or overhead walkways | SafeWork NSW, Forklift safety guide for employers (SW08196) https://www.safework.nsw.gov.au/__data/assets/pdf_file/0017/602018/Forklift-safety-guide-employers_SW08196_0519.pdf | Medium: regulator source, excerpt only, document dated 2019 by filename | Paraphrase, credited to SafeWork NSW |
+| 2 | The most effective way of ensuring people and vehicles move safely is to provide separate pedestrian and vehicle routes | SafeWork NSW, traffic management risk assessment page https://www.safework.nsw.gov.au/resource-library/transport-postal-and-warehousing/work-health-and-safety-in-the-road-freight-transport-industry/risk-assessment-traffic-management | Medium: excerpt only | Paraphrase |
+| 3 | Exclusion zones: forklift-only areas in loading bays, pedestrian-only areas around tearooms, amenities and entrances | Safe Work Australia, Workplace traffic management information sheet https://www.safeworkaustralia.gov.au/sites/default/files/2021-04/Traffic-Management-Information-Sheet.PDF | Medium: excerpt only | Short list |
+| 4 | The person operating the forklift should control the exclusion zone | Same information sheet | Medium: excerpt only | Paraphrase |
+| 5 | Around loading, erect sturdy barriers such as fences or gates; the operator should not start until everyone is clear | SafeWork NSW, loading/unloading risk assessment page https://www.safework.nsw.gov.au/resource-library/transport-postal-and-warehousing/work-health-and-safety-in-the-road-freight-transport-industry/risk-assessment-loadingunloading-procedures | Medium: excerpt only | Paraphrase |
+| 6 | Eliminating forklift and pedestrian interaction is the most effective control | WorkSafe Queensland incident alert, 2026 https://www.worksafe.qld.gov.au/news-and-events/alerts/incident-alerts/2026/workers-struck-by-forklifts-in-separate-incidents | Medium: excerpt only | Supports beat 2; not quoted |
+| 7 | SafeWork SA: 81 serious injury notifications and 14 fatalities involving powered mobile plant over 2020-21 to 2024-25 | SafeWork SA incident alert, 6 Aug 2025 https://safework.sa.gov.au/news-and-alerts/safety-alerts/incident-alerts/2025/mobile-plant-and-pedestrians-dont-mix | **Low for this video:** excerpt only; covers all powered mobile plant in one state, not forklifts or pedestrians specifically | **Not used on screen** |
+
+## Classification
+- **Verified facts:** none yet. Claims 1 to 6 are regulator guidance known from excerpts; treat as "to verify".
+- **Interpretation / opinion:** "a painted line does not stop a forklift"; "separation works when it does not depend on anyone paying attention". These are editorial framing, not legal requirements.
+- **Creative simplification:** treating "barriers first, exclusion zones where barriers cannot be permanent" as a two-step rule.
+- **Not found:** a national count of pedestrians struck by forklifts. No statistic is used.
+- **Jurisdiction:** guidance cited is NSW and national model guidance; duties vary by state and are not stated as law in the video.
+','motion-director','2026-11-13T21:05:54Z');
+INSERT INTO "documents" VALUES('DOC-0002','PRJ-0002','motion_proposal','main',1,'draft','# Idea proposal v1 — "Why forklift and pedestrian segregation matters"
+
+**Thesis:** Separation works when it does not depend on anyone paying attention: a barrier protects a distracted person, a painted line does not.
+
+**Working title:** The line that never stopped a forklift
+**Hook (0-3 s):** "A painted line has never stopped a forklift."
+**Audience:** Australian safety leaders, supervisors and frontline warehouse workers. Platform: LinkedIn, 9:16.
+**Key message:** Put something physical between people and forklifts wherever you can; where you cannot, make the zone someone''s job to control.
+
+**Beats and draft wording**
+1. The shared floor — "Forklifts and people on the same floor rely on both noticing each other, every time."
+2. What works best — "Regulators put physical separation first: guardrails, overhead walkways, separate routes."
+3. Where a barrier cannot be permanent — "At the loading dock, set an exclusion zone. The operator controls it, and nothing moves until everyone is clear."
+
+**Takeaway / CTA:** "Walk your site today. Where does safety depend on someone looking up?"
+
+**Factual basis:** claims 1-5 of the research ledger (SafeWork NSW and Safe Work Australia guidance). No statistics. Known from search excerpts only; to be verified against the documents before rendering. The hook and thesis are editorial framing, not legal requirements.
+
+**Suggested duration:** 30 seconds.
+','motion-director','2026-11-13T21:05:55Z');
 CREATE TABLE gate_log (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   at         TEXT NOT NULL,
@@ -119,8 +163,9 @@ CREATE TABLE id_counters (
 INSERT INTO "id_counters" VALUES('GEN',10);
 INSERT INTO "id_counters" VALUES('INS',3);
 INSERT INTO "id_counters" VALUES('RSH',3);
-INSERT INTO "id_counters" VALUES('APR',2);
-INSERT INTO "id_counters" VALUES('PRJ',2);
+INSERT INTO "id_counters" VALUES('APR',3);
+INSERT INTO "id_counters" VALUES('PRJ',3);
+INSERT INTO "id_counters" VALUES('DOC',3);
 CREATE TABLE inspiration_analyses (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
@@ -223,6 +268,7 @@ CREATE TABLE projects (
   updated_at   TEXT NOT NULL
 );
 INSERT INTO "projects" VALUES('PRJ-0001','Candle portrait shoot','B','ingest','active','Candle-themed portrait shoot from two saved references (REF-000001, REF-000002). Owner decision 13 Nov 2026: use REAL candles, not LED with composited flames. Plan the prop, hair styling and safety measures around live flame. No source links or creators beyond the Cap2red Studio watermark on REF-000001.',NULL,10.0,'2026-11-13T20:57:42Z','2026-11-13T20:57:42Z');
+INSERT INTO "projects" VALUES('PRJ-0002','Why forklift and pedestrian segregation matters','E','proposal','active','Motion Director test run 1 (skill default path: WHS/HSE, LinkedIn, 9:16). Title chosen by Claude from the skill''s own example; owner may substitute.',NULL,10.0,'2026-11-13T21:05:54Z','2026-11-13T21:05:55Z');
 CREATE TABLE prompts (
   id         TEXT PRIMARY KEY,                 -- PRM-0001
   project_id TEXT NOT NULL REFERENCES projects(id),
@@ -300,6 +346,9 @@ CREATE TABLE stage_history (
   at         TEXT NOT NULL
 );
 INSERT INTO "stage_history" VALUES(1,'PRJ-0001',NULL,'ingest','project created','2026-11-13T20:57:42Z');
+INSERT INTO "stage_history" VALUES(2,'PRJ-0002',NULL,'topic','project created','2026-11-13T21:05:54Z');
+INSERT INTO "stage_history" VALUES(3,'PRJ-0002','topic','research',NULL,'2026-11-13T21:05:54Z');
+INSERT INTO "stage_history" VALUES(4,'PRJ-0002','research','proposal',NULL,'2026-11-13T21:05:55Z');
 CREATE TABLE technique_shots (
   technique_id      TEXT NOT NULL REFERENCES shot_manifest(id),
   reference_shot_id TEXT NOT NULL REFERENCES reference_shots(id),
