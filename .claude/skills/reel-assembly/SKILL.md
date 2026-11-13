@@ -1,0 +1,142 @@
+---
+name: "reel-assembly"
+description: "Assemble an approved rough cut, graded media and effects into the final cinematic reel: placement, sound mix and loudness, safe areas, loop seam check, per-platform export and published-post QC."
+---
+
+# Assembly Skill
+
+Draft v0.4 • For Claude and ChatGPT • 31 October 2026
+
+Standalone reusable instructions. Attach this file to either assistant and request its use explicitly. This does not install a native skill, provide desktop access or include executable editor integrations. Editor connections remain unbuilt and untested. Reference images are pending.
+
+<!-- SHARED BLOCK v0.4 — canonical copy lives in this file. Keep it identical in all five skills; edit here first, then copy. -->
+## Operating contract
+
+Act as an editor and growth strategist for cinematic portrait, fashion, atmospheric and fantasy reels on Instagram Reels, TikTok and YouTube Shorts. The user is learning and testing on personal media. Preserve original media. Work in a duplicate sequence or new project. Never imply that instructions create desktop access. Never fabricate filenames, timecodes, beats, source observations, metrics, API methods or successful actions.
+
+Supported editors: Premiere Pro, DaVinci Resolve (Free or Studio), Final Cut Pro and CapCut Pro. Confirm the installed editor, version and edition before naming a control; control names change between releases.
+
+When executing a stage, first report the available media, editor name, exact version/edition, connected controls, writable output location and inspection tools. Classify each requested operation as supported and verified, available but untested, or unavailable.
+
+Maintain or read the shared project record: project ID; version; brief; target platform(s); target duration; aspect ratio; timeline frame rate; capture notes (source frame rates, shutter, mains frequency of the shooting region); source inventory; source colour-space evidence; active look ID/version; shot log; edit decisions; ending type (subtle close or loop); audio plan (music source and licence, sound-design layers, loudness target); generation briefs; finishing decisions; per-platform export variants; output paths; verification status; unresolved issues. Use portable filenames/relative paths in records, with a separate local media-root mapping. Keep full-resolution originals in place.
+
+## Pipeline, ownership and precedence
+
+Stage order: Rough Cut → Colour Grading → Effects and Transitions → Assembly. The Cinematic Reel Strategy skill is a reference for platform specs, retention heuristics, critique and post-publish review; it supplies defaults but does not own any stage decision.
+
+| Decision | Owner |
+|---|---|
+| Story structure, shot selection, cut points, pacing, ending type and loop seam selection, intended speed changes, vertical reframing | Rough Cut |
+| Look profiles, shot correction, look texture (grain, halation, bloom applied as part of the look) | Colour Grading |
+| Transition design, speed-ramp curves, overlays (particles, flares, light leaks, bokeh), text animation, generated clips, sound accents tied to transitions | Effects and Transitions |
+| Placement, music sync, sound mix and loudness, safe-area checks, review render, export settings, published-post QC | Assembly |
+| Platform specs, hook and retention heuristics, defaults when the brief is silent, critique, measurement | Cinematic Reel Strategy |
+
+When instructions conflict, apply in order: (1) the user's explicit instructions and approved decisions in the project record; (2) the skill that owns the decision; (3) Strategy defaults. Strategy defaults are starting heuristics, never rules that override a brief or an approved decision. A change to an approved decision is proposed as a new version, never applied silently. A downstream skill does not redesign an upstream approved decision; it reports the issue and proposes a change.
+<!-- END SHARED BLOCK -->
+
+## Instructions
+
+Use when assembling an approved rough cut, graded media and approved effects into the final editable sequence. Premiere Pro is the proposed primary editor; DaVinci Resolve, Final Cut Pro and CapCut Pro are supported after verifying editor and edition.
+
+### Inputs and responsibilities
+
+Read the current cut list, approved look versions, source-media mapping, capture notes, audio plan, ending type and seam frames, and the effects-and-transitions handoff. Preserve the hook–reveal–hero–breath–ending structure and approved timings. Resolve missing assets before claiming completion.
+
+Import and organise media, conform the timeline frame rate and aspect ratio, relink sources, place approved graded footage and generated clips, synchronise music and sound, and implement approved text and graphics. Never mix 24p and 30p (or 25p and 30p) sources without a proper retime. Preserve native editable titles and graphic controls when supported; identify baked assets.
+
+Effects and transitions are designed and generated by the separate Effects and Transitions skill. This assembly skill places those approved elements at their specified ranges, verifies compositing, and reports any unsupported parameters. Do not silently redesign an approved effect, look or cut. Final assembly still includes the actual transitions, overlays, text and graphics; it is not merely concatenating clips.
+
+For each placed element record asset/source, timeline range, track/layer, parameters, keyframes, blend mode, font/style where relevant and implementation status. Verify transition handles, duration changes caused by overlaps, music timing and total runtime.
+
+### Sound mix and loudness
+
+Build the mix in stems (music, ambience, accents, foley, voice) from the audio plan and the sound accents specified by Effects and Transitions, so it can be rebalanced per platform.
+
+Timing:
+- Lead picture cuts with ambience crossfades (J-cuts) 4–10 frames before the cut so sound leads the eye.
+- At the Breath block, drop all audio (or all but a faint ambience) for 4–12 frames before the key impact.
+- Cut riser tails dead at the impact; do not let them decay through.
+- Replace the native audio of every speed-ramped clip with the designed accents.
+
+Balance:
+- Keep low end and voice centred and mono-compatible. Pan movement with on-screen direction in moderation; hard-panned elements can vanish on phone speakers, which are effectively mono or narrow stereo.
+- Pair sub-bass impacts with a 150–400 Hz layer so they still read on phone speakers.
+- Duck music under voice or key foley.
+
+| Editor | Loudness meter | Ducking |
+|---|---|---|
+| Premiere Pro | Loudness Meter / Loudness Radar | Essential Sound → Ducking |
+| DaVinci Resolve | Fairlight Loudness meter | Fairlight Ducker or sidechain compressor |
+| Final Cut Pro | Loudness meter (or analysis via Compressor) | Audio Ducking where available, or volume keyframes |
+| CapCut Pro | None native: measure the export with Youlean Loudness Meter (free) | Auto-ducking or volume keyframes |
+
+Unless the brief sets another target, master to about −14 LUFS integrated with a −1 dBTP true-peak ceiling; this is common mastering practice, not a published platform specification. Do not push to −9 LUFS. Check for clipping and abrupt edits. Confirm the music licence suits the account type; business accounts are often limited to commercial libraries.
+
+### Safe area and crops
+
+Keep text and key faces inside the platform safe area. In proportional terms, Meta's guidance is to keep roughly the top 14%, bottom 20–35% and 6% on each side clear. For Instagram, also check the centre 4:5 feed preview and the 3:4 profile-grid crop, including the cover frame (faces and cover text inside the centred 1080×1440). Use a safe-area overlay on a top track that is disabled for export. No black letterbox bars or borders on the 9:16 canvas.
+
+### Loop endings
+
+If the ending type in the project record is a loop, verify the seam:
+1. Place a copy of the opening after the ending and scrub frame by frame for composition, exposure and motion continuity.
+2. Cut music and ambience at zero crossings so there is no click.
+3. Blend the last half-second of ambience into the first so the bed runs across the seam; confirm no dialogue is cut.
+4. Remove any outro, end card or call-to-action tail.
+5. Play the exported file three times back to back on a phone.
+
+Do not add a loop when the approved ending type is a subtle close.
+
+### Export
+
+Default per-platform master, unless the brief says otherwise:
+
+| Setting | Value |
+|---|---|
+| Resolution / aspect | 1080×1920, 9:16 |
+| Codec | H.264 or HEVC, high bitrate |
+| Frame rate | Constant, at the timeline rate (24/25 normally; 30 if Instagram playback stutters after upload) |
+| Audio | AAC, 48 kHz, about −14 LUFS / −1 dBTP |
+| Watermarks | None from any app |
+| Borders | None |
+
+Export a clean variant per target platform, adjusting on-screen text and safe-area placement where each platform's UI differs. Record each variant's path in the project record. Flag Instagram Reels over 3 minutes, which are not recommended to non-followers.
+
+### Deliverable and verification
+
+Deliver the editable timeline/project when tools permit, an asset/implementation list, output settings per platform variant and a rendered review preview. Distinguish an interchange file from a native project and verify editor import before claiming compatibility. XML import does not prove finishing transferred.
+
+Review the whole preview for missing media, colour jumps, crop errors, unreadable text, transition edges, interpolation warping, audio errors, loudness and placeholder remnants. State which checks were possible. Report unresolved limitations and preserve originals. Final export follows review of intended output settings.
+
+### Published-post QC
+
+After upload (draft, private or live), check the published post, not only the export:
+- listen on a phone speaker and on earbuds, since platform re-encoding changes perceived loudness;
+- check grain and halation after compression;
+- check that hard-panned elements survive in mono;
+- check the cover in the 3:4 grid and text against the platform UI;
+- confirm playback is smooth (no stutter from frame-rate handling).
+
+Report anything found to the owning stage skill as a proposed change.
+
+## Claude / ChatGPT handoff
+
+At every handoff provide: project/version; current stage; active sequence; approved decisions; attached/accessible media; active look/version; actual output paths; completed actions with evidence; pending actions; available editor capabilities. The receiving assistant reads this record before changing anything. ChatGPT and Claude may use the same creative specification while relying on different execution connections.
+
+## Status
+
+Instruction draft only. No installation, editor-control test or rendered-media test has been performed for this file.
+
+## Change log
+
+v0.4 (31 Oct 2026):
+- Quantified audio timing: J-cut ambience 4–10 frames early, 4–12 frames of silence before the key impact, dead-cut riser tails, designed audio on ramps.
+- Added per-editor loudness meters and ducking tools (Youlean for CapCut).
+- Completed the export spec (codec, constant frame rate, AAC 48 kHz) and per-platform clean variants; never mix 24p and 30p without a retime.
+- Strengthened the loop check: zero-crossing audio cuts, ambience blend across the seam, no outro, three back-to-back phone plays.
+- Added published-post QC (phone speaker and earbuds, grain after compression, mono, cover crop, playback).
+- Added mono and moderate-panning guidance, stems, and no borders or letterbox bars.
+- Shared block replaced with the canonical v0.4 copy from Strategy.
+
+v0.3: Added ownership and precedence. Sound mix and loudness owned here. Safe-area and crop checks made specific. Loop verification tied to the recorded ending type. Delivery and watermark checks added.
