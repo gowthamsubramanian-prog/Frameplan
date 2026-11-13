@@ -1,0 +1,7 @@
+# The live database is rebuilt from data/studio.sql (run: python3 studio/studio.py snapshot before committing)
+data/studio.db
+data/studio.db-journal
+__pycache__/
+*.pyc
+# Media stays outside git; register it in the asset registry instead
+media/

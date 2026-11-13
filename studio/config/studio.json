@@ -1,0 +1,20 @@
+{
+  "budget": {
+    "per_project_usd": 10.0,
+    "monthly_usd": 100.0,
+    "reels_per_month_target": 10
+  },
+  "models": {
+    "_note": "Subagent model aliases accepted by Claude Code: fable, opus, sonnet, haiku. Do not depend on fable.",
+    "orchestrator": "session",
+    "reference-analyst": "sonnet",
+    "creative-director": "opus",
+    "shot-planner": "sonnet",
+    "generation-director": "sonnet",
+    "qa-reviewer": "opus"
+  },
+  "paid_tools": {
+    "_note": "Tool-name regex gated by .claude/hooks/paid_gate.py. Keep in sync with .claude/settings.json.",
+    "pattern": "^mcp__(kling-ai|plugin_kling-ai_kling-ai)__(text_to_image|image_to_image|text_to_video|image_to_video|motion_control|omni_ref_video)$|^mcp__Idea_AI__(create_image|edit_image|create_video|create_audio|create_3d_model|extract_text_from_media|generate|generate_with_upload)$"
+  }
+}
