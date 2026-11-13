@@ -26,8 +26,6 @@ INSTALLED = {
     ".claude/skills/motion-director/SKILL.md": ORIG / "SKILL(1).md",
     ".claude/skills/cinematic-reel-storyboard/SKILL.md": ORIG / "Cinematic_Storyboard_SKILL_v2.md",
     ".claude/agents/inspiration-intelligence.md": A00 / ".claude/agents/inspiration-intelligence.md",
-    ".claude/skills/inspiration-intelligence/SKILL.md": A00 / ".claude/skills/inspiration-intelligence/SKILL.md",
-    "references/analysis-schema.json": A00 / "references/analysis-schema.json",
     "references/import-example.csv": A00 / "references/import-example.csv",
 }
 
@@ -46,6 +44,24 @@ class TestVerbatimInstall(unittest.TestCase):
         self.assertEqual(sha(A00 / "tools/inspiration.py"),
                          "3abca174a226965601b22d1912869ee9bb3eab9777fa30c7b3a9177b53fecb33")
         self.assertIn("Modified 13 Nov 2026 with the owner's approval", (ROOT / "tools/inspiration.py").read_text())
+
+    def test_agent00_skill_keeps_every_original_line_and_declares_its_additions(self):
+        original = (A00 / ".claude/skills/inspiration-intelligence/SKILL.md").read_text()
+        current = (ROOT / ".claude/skills/inspiration-intelligence/SKILL.md").read_text()
+        for line in original.splitlines():
+            if line.strip():
+                self.assertIn(line.rstrip(), current, line[:60])       # additions only, nothing removed
+        self.assertIn("## Change note", current)
+
+    def test_analysis_schema_keeps_every_original_field(self):
+        original = json.loads((A00 / "references/analysis-schema.json").read_text())
+        current = json.loads((ROOT / "references/analysis-schema.json").read_text())
+        for k, v in original.items():
+            if k != "shot_candidates":
+                self.assertEqual(current[k], v, k)
+        for k, v in original["shot_candidates"][0].items():
+            self.assertEqual(current["shot_candidates"][0][k], v, k)
+        self.assertIn("blocked_reason", current)
 
     def test_archive_still_matches_the_packs_own_checksums(self):
         lines = [l.split() for l in (PACK / "03_HANDOFF" / "SOURCE_CHECKSUMS.txt").read_text().splitlines()
@@ -111,6 +127,8 @@ class Base(unittest.TestCase):
 
     def analyse(self, ref, status, techniques=(), genre=(), shots=(), **extra):
         f = self.dir / f"{ref}.json"
+        if status == "blocked":
+            extra.setdefault("blocked_reason", "login_required")
         f.write_text(json.dumps({"reference_id": ref, "access_status": status, "genre": list(genre),
                                  "story_summary": extra.pop("summary", ""), "techniques": list(techniques),
                                  "shot_candidates": list(shots), **extra}))
@@ -420,3 +438,87 @@ class TestAgent00LocalFiles(Base):
         e = self.dir / "p.csv"; self.a00("export-shots", str(e))
         row = list(csv.DictReader(e.read_text().splitlines()))[0]
         self.assertEqual((row["source_url"], row["reference_id"]), ("file:media/ref.mp4", "REF-000001"))
+
+
+class TestAgent00GapFixes(Base):
+    """Approved changes: a reason for every block, and timecodes in the shot export."""
+
+    def raw_analyse(self, obj):
+        f = self.dir / "x.json"; f.write_text(json.dumps(obj))
+        return subprocess.run([sys.executable, str(self.dir / "a00" / "tools" / "inspiration.py"), "analyse", str(f)],
+                              capture_output=True, text=True)
+
+    def test_blocked_needs_a_reason_and_it_is_shown_and_mirrored(self):
+        self.a00("add", "https://www.instagram.com/p/DdlYkrlFHIk/")
+        p = self.raw_analyse({"reference_id": "REF-000001", "access_status": "blocked"})
+        self.assertEqual(p.returncode, 2); self.assertIn("blocked_reason", p.stderr)
+        p = self.raw_analyse({"reference_id": "REF-000001", "access_status": "blocked", "blocked_reason": "it broke"})
+        self.assertEqual(p.returncode, 2)
+        p = self.raw_analyse({"reference_id": "REF-000001", "access_status": "blocked", "blocked_reason": "network_policy",
+                              "notes": "CONNECT tunnel failed, response 403"})
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertIn("blocked (network_policy)", self.a00("list"))
+        self.sync()
+        s = self.ok("ins", "show", "INS-0001")
+        self.assertEqual((s["access_status"], s["access_detail"], s["analysis_status"]), ("blocked", "network_policy", "none"))
+
+    def test_network_block_and_login_wall_are_distinguishable(self):
+        self.a00("add", "https://www.instagram.com/reel/AAA/"); self.a00("add", "https://www.pinterest.com/pin/42/")
+        self.analyse("REF-000001", "blocked", blocked_reason="network_policy")
+        self.analyse("REF-000002", "blocked", blocked_reason="login_required")
+        self.sync()
+        self.assertEqual([self.ok("ins", "show", i)["access_detail"] for i in ("INS-0001", "INS-0002")],
+                         ["network_policy", "login_required"])
+
+    def test_reason_is_refused_on_a_reference_that_was_reviewed_and_cleared_on_later_review(self):
+        self.a00("add", "https://www.instagram.com/reel/BBB/")
+        p = self.raw_analyse({"reference_id": "REF-000001", "access_status": "reviewed_video", "blocked_reason": "other"})
+        self.assertEqual(p.returncode, 2)
+        self.analyse("REF-000001", "blocked", blocked_reason="login_required")
+        self.analyse("REF-000001", "reviewed_images", summary="screenshot supplied")
+        self.assertIn("| reviewed_images |", self.a00("list"))
+        self.sync()
+        self.assertIsNone(self.ok("ins", "show", "INS-0001")["access_detail"])
+
+    def test_catalog_made_by_the_original_tool_is_upgraded_in_place(self):
+        self.a00_db.parent.mkdir(parents=True)
+        con = sqlite3.connect(self.a00_db)
+        con.executescript("""CREATE TABLE refs (id INTEGER PRIMARY KEY, url TEXT NOT NULL, url_key TEXT UNIQUE NOT NULL,
+            platform TEXT, creator TEXT DEFAULT '', title TEXT DEFAULT '', notes TEXT DEFAULT '', collection_name TEXT DEFAULT '',
+            access_status TEXT NOT NULL DEFAULT 'unreviewed', genre_json TEXT DEFAULT '[]', summary TEXT DEFAULT '',
+            difficulty TEXT DEFAULT '', analysis_json TEXT DEFAULT '{}', created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+            INSERT INTO refs(url,url_key,platform,creator,created_at,updated_at)
+            VALUES('https://www.instagram.com/reel/OLD/','https://instagram.com/reel/OLD','instagram','@old','t','t');""")
+        con.commit(); con.close()
+        self.assertIn("REF-000001 | instagram | unreviewed | @old", self.a00("list"))
+        self.analyse("REF-000001", "blocked", blocked_reason="removed")
+        self.assertIn("blocked (removed)", self.a00("list"))
+
+    def test_export_carries_timecodes_and_frames_from_the_analysis(self):
+        self.a00("add", "https://www.instagram.com/reel/CCC/")
+        self.analyse("REF-000001", "reviewed_video", shots=[
+            {"label": "veil lift", "shot_size": "CU", "start_time": "00:02.000", "end_time": "00:03.520",
+             "actual_frame": "shot_02_actual_frame.jpg", "focal_length": "85mm", "confidence": "observed"},
+            {"label": "walk in", "shot_size": "WS", "timecode": "00:00-00:02", "confidence": "inferred"},
+            {"label": "idea only", "shot_size": "MS", "confidence": "suggested"}])
+        e = self.dir / "p.csv"
+        self.assertIn("Exported 3 proposed shots", self.a00("export-shots", str(e)))
+        rows = list(csv.DictReader(e.read_text().splitlines()))
+        self.assertEqual([(r["start_time"], r["end_time"], r["actual_frame"]) for r in rows],
+                         [("00:02.000", "00:03.520", "shot_02_actual_frame.jpg"), ("00:00", "00:02", ""), ("", "", "")])
+        self.assertEqual(rows[0]["focal_length"], "85mm")
+        self.sync()
+        self.ok("refshot", "import", str(e))
+        listed = self.ok("refshot", "list")
+        self.assertEqual((listed[0]["start_time"], listed[0]["end_time"]), ("00:02.000", "00:03.520"))
+
+    def test_export_says_when_there_is_nothing_to_export(self):
+        self.a00("add", "https://www.instagram.com/reel/DDD/")
+        e = self.dir / "empty.csv"
+        self.assertIn("Nothing to export", self.a00("export-shots", str(e)))
+        self.assertEqual(len(e.read_text().splitlines()), 1)
+
+    def test_skill_documents_the_three_additions(self):
+        text = (ROOT / ".claude/skills/inspiration-intelligence/SKILL.md").read_text()
+        for needle in ("add media/incoming/clip.mp4", "blocked_reason", "network_policy", "start_time"):
+            self.assertIn(needle, text)

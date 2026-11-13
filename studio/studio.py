@@ -705,10 +705,11 @@ def sync_agent00(con, src: Path) -> dict:
         if not dup:        # the first REF for a post is authoritative for its descriptive fields
             meta = {k: r[k] for k in ("platform", "collection_name", "created_at", "updated_at")}
             title = (r["title"] or "").strip() or r["url"]
+            detail = (r["access_detail"] if "access_detail" in r.keys() else "") or None
             con.execute("UPDATE inspirations SET title=?, title_norm=?, creator=?, notes=?, collection=?, "
-                        "access_status=?, source_meta_json=? WHERE id=?",
+                        "access_status=?, access_detail=?, source_meta_json=? WHERE id=?",
                         (title, norm_text(title), r["creator"] or None, r["notes"] or None,
-                         r["collection_name"] or None, r["access_status"],
+                         r["collection_name"] or None, r["access_status"], detail,
                          json.dumps({"agent00": meta}, ensure_ascii=False), iid))
         if has_analysis:
             if record_analysis(con, iid, "agent00", r["access_status"], analysis,

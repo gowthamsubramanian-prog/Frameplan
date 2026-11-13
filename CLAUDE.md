@@ -38,8 +38,10 @@ is waiting on the owner. Do not describe anything as working unless that file or
 5. **Do not redesign the owner's components.** Motion Director, Cinematic Reel Storyboard and
    Agent 00 (Inspiration Intelligence) are installed exactly as recovered; the originals are in
    `archive/recovery-pack-2026-11-13/` and a test checks the installed copies still match.
-   One approved exception: `tools/inspiration.py` was changed on 13 Nov 2026 so `add` and `import`
-   accept a local media file (stored as `file:<path>`, deduplicated by content hash).
+   Approved exceptions, all additions made on 13 Nov 2026 to Agent 00's catalog tool, skill text
+   and analysis schema: local media files can be catalogued (`file:<path>`, deduplicated by
+   content hash); a `blocked` analysis must give a `blocked_reason`; the shot export carries
+   timecodes and frame names. The subagent definition itself is unchanged.
    Change them only with the owner's approval. No Creative Director is installed: a draft
    specification is in `docs/drafts/` awaiting review. `frameplan-reference-analyser` and the
    Frameplan app are separate things that have not been seen; do not assume either is Agent 00,
@@ -64,7 +66,9 @@ Label every observation about a reference with one of four certainties, and reco
 | `unverified` | Reported by someone or something else and not checked |
 
 Access status is one of `reviewed_video`, `reviewed_images`, `metadata_only`, `blocked`,
-`unreviewed`. Reading a link's page text or caption is `metadata_only`; it is never a video review.
+`unreviewed`. A `blocked` record says why: `network_policy` (this session could not reach the
+host, so nothing is known about the post itself), `login_required`, `not_found`, `removed`,
+`rate_limited` or `other`. Reading a link's page text or caption is `metadata_only`; it is never a video review.
 Use references to learn techniques and build original combinations, not to copy wholesale.
 
 ## Creative context
@@ -93,7 +97,7 @@ the owner to define a genre before recognising one.
 | `studio/adapters/` | Service adapters; Kling is dry-run only |
 | `.claude/agents/` | Subagents: `inspiration-intelligence` (Agent 00), `generation-director`, `qa-reviewer` |
 | `.claude/skills/{motion-director,cinematic-reel-storyboard,inspiration-intelligence}/` | Owner's recovered skills, installed verbatim |
-| `tools/inspiration.py`, `references/` | Agent 00's catalog tool (one approved change: local files), analysis schema and sample import |
+| `tools/inspiration.py`, `references/` | Agent 00's catalog tool and analysis schema (with the approved additions), sample import |
 | `archive/` | Unaltered recovered originals; nothing here is loaded |
 | `studio/config/studio.json` | Budgets, agent model choices, paid-tool pattern |
 | `data/` | `studio.sql` snapshot, Agent 00 catalog (`inspirations.sqlite3`), Instagram state (`data/instagram/`) |

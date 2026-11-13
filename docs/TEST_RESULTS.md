@@ -1,7 +1,7 @@
 # Test results
 
 Run on 13 November 2026 with `python3 -m unittest discover -s tests -v`
-(Python 3.13, SQLite 3.53). **92 tests, 92 passed.**
+(Python 3.13, SQLite 3.53). **101 tests, 101 passed.**
 
 These tests cover the database tool, the workflow gates, the paid-generation hook script, the
 merged skills, the video breakdown script (on a synthetic clip built by ffmpeg), the agent
@@ -13,7 +13,7 @@ keeps IDs, URLs, creator, access status, certainty labels and analysis history, 
 duplicate links into one record; the 15-column manifest round-trips the owner's template exactly.
 
 Agent 00 was also run once on its own; that is a behavioural test, logged separately in
-`docs/tests/AGENT00_TEST_2026-11-13.md`, and is not part of the 92.
+`docs/tests/AGENT00_TEST_2026-11-13.md`, and is not part of the 101.
 
 They do not cover: any subagent actually running, analysis of real footage or real references,
 any live generation, or the hook firing inside a live session.
@@ -38,6 +38,13 @@ any live generation, or the hook firing inside a live session.
 ## Full output
 
 ```
+test_blocked_needs_a_reason_and_it_is_shown_and_mirrored [TestAgent00GapFixes] ... ok
+test_catalog_made_by_the_original_tool_is_upgraded_in_place [TestAgent00GapFixes] ... ok
+test_export_carries_timecodes_and_frames_from_the_analysis [TestAgent00GapFixes] ... ok
+test_export_says_when_there_is_nothing_to_export [TestAgent00GapFixes] ... ok
+test_network_block_and_login_wall_are_distinguishable [TestAgent00GapFixes] ... ok
+test_reason_is_refused_on_a_reference_that_was_reviewed_and_cleared_on_later_review [TestAgent00GapFixes] ... ok
+test_skill_documents_the_three_additions [TestAgent00GapFixes] ... ok
 test_bad_input_is_a_clean_error_not_a_traceback [TestAgent00LocalFiles] ... ok
 test_import_accepts_files_and_reports_bad_rows_without_stopping [TestAgent00LocalFiles] ... ok
 test_links_behave_exactly_as_before [TestAgent00LocalFiles] ... ok
@@ -63,6 +70,8 @@ test_wrong_format_is_refused [TestReferenceShotManifest] ... ok
 test_old_database_is_refused_until_upgraded [TestSchemaUpgrade] ... ok
 test_upgrade_keeps_every_row_and_maps_access_states [TestSchemaUpgrade] ... ok
 test_agent00_definition_is_unchanged_and_has_no_model_pinned [TestVerbatimInstall] ... ok
+test_agent00_skill_keeps_every_original_line_and_declares_its_additions [TestVerbatimInstall] ... ok
+test_analysis_schema_keeps_every_original_field [TestVerbatimInstall] ... ok
 test_archive_still_matches_the_packs_own_checksums [TestVerbatimInstall] ... ok
 test_catalog_tool_original_is_preserved_and_the_change_is_declared [TestVerbatimInstall] ... ok
 test_installed_files_are_byte_identical_to_the_recovered_originals [TestVerbatimInstall] ... ok

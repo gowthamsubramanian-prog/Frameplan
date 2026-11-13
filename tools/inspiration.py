@@ -2,8 +2,9 @@
 """Offline, stdlib-only catalog. It never scrapes URLs or retrieves private collections.
 
 Modified 13 Nov 2026 with the owner's approval: `add` and `import` also accept a path to a local
-media file (an upload or download with no known link). The original is kept unaltered in
-archive/recovery-pack-2026-11-13/.
+media file (an upload or download with no known link); a `blocked` analysis must say why
+(`blocked_reason`); `export-shots` carries timecodes and frame names from the analysis and says
+when there is nothing to export. The original is kept unaltered in archive/recovery-pack-2026-11-13/.
 """
 import argparse
 import csv
@@ -17,6 +18,7 @@ from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "inspirations.sqlite3"
+BLOCKED_REASONS = ("network_policy", "login_required", "not_found", "removed", "rate_limited", "other")
 SHOT_FIELDS = "index shot_id start_time end_time shot_size body_crop camera_angle camera_height composition model_movement camera_movement focal_length recording_settings actual_frame sketch confidence".split()
 
 
@@ -68,7 +70,19 @@ def connect():
       created_at TEXT NOT NULL, updated_at TEXT NOT NULL
     );
     """)
+    if "access_detail" not in [c[1] for c in db.execute("PRAGMA table_info(refs)")]:
+        db.execute("ALTER TABLE refs ADD COLUMN access_detail TEXT DEFAULT ''")   # why a source is blocked
+        db.commit()
     return db
+
+
+def shot_times(shot):
+    """start/end for a shot candidate: explicit fields, or a 'timecode' written as 'start-end'."""
+    start, end = str(shot.get('start_time', '') or ''), str(shot.get('end_time', '') or '')
+    tc = str(shot.get('timecode', '') or '')
+    if not start and not end and tc:
+        start, _, end = (part.strip() for part in tc.partition('-'))
+    return start, end
 
 
 def add(db, item, collection=''):
@@ -92,7 +106,8 @@ def add(db, item, collection=''):
 
 
 def output(row):
-    print(f"REF-{row['id']:06d} | {row['platform']} | {row['access_status']} | {row['creator'] or 'creator unknown'} | {row['title'] or row['url']} | {row['collection_name']}")
+    status = row['access_status'] + (f" ({row['access_detail']})" if row['access_detail'] else '')
+    print(f"REF-{row['id']:06d} | {row['platform']} | {status} | {row['creator'] or 'creator unknown'} | {row['title'] or row['url']} | {row['collection_name']}")
 
 
 def main():
@@ -136,8 +151,14 @@ def main():
         if row is None: p.error('Reference ID not found; add URL first')
         statuses=('reviewed_video','reviewed_images','metadata_only','blocked','unreviewed')
         if obj.get('access_status') not in statuses: p.error(f'access_status must be one of {statuses}')
+        reason = obj.get('blocked_reason') or ''
+        if obj['access_status'] == 'blocked' and reason not in BLOCKED_REASONS:
+            p.error(f"a blocked reference needs blocked_reason, one of {BLOCKED_REASONS}; put the actual error text in notes")
+        if obj['access_status'] != 'blocked' and reason:
+            p.error('blocked_reason only applies when access_status is blocked')
         for t in obj.get('techniques',[]):
             if t.get('certainty') not in ('observed','inferred','suggested','unverified'): p.error('Each technique needs a valid certainty')
+        db.execute('UPDATE refs SET access_detail=? WHERE id=?', (reason, rid))
         db.execute('UPDATE refs SET access_status=?,creator=?,title=?,genre_json=?,summary=?,difficulty=?,analysis_json=?,updated_at=? WHERE id=?',
            (obj['access_status'],obj.get('creator') or row['creator'],obj.get('title') or row['title'],json.dumps(obj.get('genre',[])),obj.get('story_summary',''),obj.get('difficulty',''),json.dumps(obj,ensure_ascii=False),now(),rid))
         db.commit(); print(f"Saved analysis for {ridstr}")
@@ -157,12 +178,15 @@ def main():
                 for shot in obj.get('shot_candidates',[]):
                     count+=1; record={k:'' for k in SHOT_FIELDS}; record.update({
                         'index':count,'shot_id':f'PROPOSED-{count:04d}','shot_size':shot.get('shot_size',''),
+                        'start_time':shot_times(shot)[0],'end_time':shot_times(shot)[1],
+                        'focal_length':shot.get('focal_length',''),'recording_settings':shot.get('recording_settings',''),
+                        'actual_frame':shot.get('actual_frame',''),'sketch':shot.get('sketch',''),
                         'body_crop':shot.get('body_crop',''),'camera_angle':shot.get('camera_angle',''),
                         'camera_height':shot.get('camera_height',''),'composition':shot.get('composition',''),
                         'model_movement':shot.get('model_movement',''),'camera_movement':shot.get('camera_movement',''),
                         'confidence':shot.get('confidence','suggested')})
                     record.update(reference_id=f"REF-{r['id']:06d}",source_url=r['url'],creator=r['creator'],candidate_label=shot.get('label',''),approval_status='PENDING_REVIEW')
                     w.writerow(record)
-        print(f"Exported {count} proposed shots to {out}")
+        print(f"Exported {count} proposed shots to {out}" if count else f"Nothing to export: no analysis has shot candidates. Wrote the header only to {out}")
 
 if __name__=='__main__': main()
