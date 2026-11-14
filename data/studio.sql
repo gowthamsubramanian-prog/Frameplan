@@ -45,6 +45,7 @@ INSERT INTO "approvals" VALUES('APR-0001',NULL,'manifest_update','RSH-0001,RSH-0
 INSERT INTO "approvals" VALUES('APR-0002','PRJ-0002','concept','DOC-0002','IDEA APPROVAL: The line that never stopped a forklift (30 s, three beats)','rejected',NULL,NULL,NULL,0,'STOP. Do not approve or continue the forklift safety concept. The test has failed its input relevance requirement.','2026-11-13T21:05:55Z','2026-11-13T21:10:33Z');
 INSERT INTO "approvals" VALUES('APR-0003','PRJ-0001','concept','DOC-0003,DOC-0004,DOC-0005','Choose one of three candle-portrait concepts: A Vigil, B The Candle-Bearer, C Offering','approved',NULL,NULL,NULL,0,'I accept the amendment, keep the items, approve concept A','2026-11-13T21:11:33Z','2026-11-13T21:35:44Z');
 INSERT INTO "approvals" VALUES('APR-0004','PRJ-0001','style','DOC-0006','Choose a style treatment for Vigil: 1 Ember, 2 Cold Hours, 3 Until Dawn','approved',NULL,NULL,NULL,0,'Approve 1 and blend 2 in. I do prefer some AI generated images','2026-11-13T21:35:44Z','2026-11-13T21:41:18Z');
+INSERT INTO "approvals" VALUES('APR-0005','PRJ-0001','paid_generation','PRM-0001,PRM-0002,PRM-0003','3 AI preview stills for Vigil on idea.ai, Seedream 4.5, 690 coins each = 2,070 coins. USD equivalent not known (connector gives no dollar price); max-cost recorded as 0 because the owner gave no USD cap, so the USD budget does not reflect this spend.','approved',0.0,3,0,0,'Approve 3 preview images','2026-11-14T08:45:37Z','2026-11-14T08:45:37Z');
 CREATE TABLE assets (
   id           TEXT PRIMARY KEY,               -- AST-0001
   project_id   TEXT REFERENCES projects(id),
@@ -56,6 +57,9 @@ CREATE TABLE assets (
   meta_json    TEXT,
   created_at   TEXT NOT NULL
 );
+INSERT INTO "assets" VALUES('AST-0001','PRJ-0001','generated','https:/modality-cdn.idea.ai/mcp/textToImage/27709881/3M5ggkekRxaoIeCW9ZJKpFkW0hl.jpeg',NULL,NULL,'{"generation_id":"3M5ggfJQWbf1GGRcNYLGMVFnWWB","provider":"idea_ai","model":"seedream_4_5","size":"1728x2304","aspect":"3:4, crop to 4:5","purpose":"style preview, beat 1","note":"hosted by idea.ai; not downloaded because this session''s network blocks the host"}','2026-11-14T08:47:02Z');
+INSERT INTO "assets" VALUES('AST-0002','PRJ-0001','generated','https:/modality-cdn.idea.ai/mcp/textToImage/27709881/3M5gheAUCHzs19giTqcoitOSrRU.jpeg',NULL,NULL,'{"generation_id":"3M5ghbotVktwenGcfkOaicZYAgz","provider":"idea_ai","model":"seedream_4_5","size":"1728x2304","aspect":"3:4, crop to 4:5","purpose":"style preview, beat 2","note":"hosted by idea.ai; not downloaded because this session''s network blocks the host"}','2026-11-14T08:47:02Z');
+INSERT INTO "assets" VALUES('AST-0003','PRJ-0001','generated','https:/modality-cdn.idea.ai/mcp/textToImage/27709881/3M5gi9XVN12oQjR9mcxlP5vFaka.jpeg',NULL,NULL,'{"generation_id":"3M5gi8wjbhewcsLbpn3E5CIV7Bb","provider":"idea_ai","model":"seedream_4_5","size":"1728x2304","aspect":"3:4, crop to 4:5","purpose":"style preview, beat 3","note":"hosted by idea.ai; not downloaded because this session''s network blocks the host"}','2026-11-14T08:47:03Z');
 CREATE TABLE documents (
   id         TEXT PRIMARY KEY,                 -- DOC-0001
   project_id TEXT NOT NULL REFERENCES projects(id),
@@ -221,6 +225,9 @@ CREATE TABLE gate_log (
   approval_id TEXT,
   reason     TEXT
 );
+INSERT INTO "gate_log" VALUES(1,'2026-11-14T08:45:44Z','mcp__Idea_AI__create_image','allowed','APR-0005','2 uses left');
+INSERT INTO "gate_log" VALUES(2,'2026-11-14T08:45:58Z','mcp__Idea_AI__create_image','allowed','APR-0005','1 uses left');
+INSERT INTO "gate_log" VALUES(3,'2026-11-14T08:46:03Z','mcp__Idea_AI__create_image','allowed','APR-0005','0 uses left');
 CREATE TABLE generations (
   id           TEXT PRIMARY KEY,               -- GNR-0001
   project_id   TEXT NOT NULL REFERENCES projects(id),
@@ -236,6 +243,9 @@ CREATE TABLE generations (
   review_notes TEXT,
   created_at   TEXT NOT NULL
 );
+INSERT INTO "generations" VALUES('GNR-0001','PRJ-0001','PRM-0001','APR-0005','idea_ai','mcp__Idea_AI__create_image','succeeded','3M5ggfJQWbf1GGRcNYLGMVFnWWB',NULL,690.0,'AST-0001','Usable for mood. Warm amber on hands, cool fill and teal background read clearly; hands correct. Not as prompted: both candles already lit, so it shows a relight rather than the first lighting; face cropped at the frame edge; cool fill is stronger than the faint fill asked for; blacks deep, not matte.','2026-11-14T08:47:02Z');
+INSERT INTO "generations" VALUES('GNR-0002','PRJ-0001','PRM-0002','APR-0005','idea_ai','mcp__Idea_AI__create_image','succeeded','3M5ghbotVktwenGcfkOaicZYAgz',NULL,690.0,'AST-0002','Strongest of the three. Pose, wax piece, half-burned candles and the warm-cool split all read. Artefact: an unexplained orange glow patch on the side of the neck. Pose and framing sit very close to REF-000001; treat as direction, not a shot to copy.','2026-11-14T08:47:02Z');
+INSERT INTO "generations" VALUES('GNR-0003','PRJ-0001','PRM-0003','APR-0005','idea_ai','mcp__Idea_AI__create_image','succeeded','3M5gi8wjbhewcsLbpn3E5CIV7Bb',NULL,690.0,'AST-0003','Weakest. Candles are mid-height, not stubs; the extinguished wick looks charred; the smoke trail rises from beside the lit flame rather than the blown-out one; both hands grip the one shoulder awkwardly. Overall too teal: Cold Hours dominates the Ember base.','2026-11-14T08:47:03Z');
 CREATE TABLE genres (
   id          TEXT PRIMARY KEY,                -- GEN-0001
   name        TEXT NOT NULL,
@@ -264,10 +274,12 @@ CREATE TABLE id_counters (
 INSERT INTO "id_counters" VALUES('GEN',10);
 INSERT INTO "id_counters" VALUES('INS',3);
 INSERT INTO "id_counters" VALUES('RSH',3);
-INSERT INTO "id_counters" VALUES('APR',5);
+INSERT INTO "id_counters" VALUES('APR',6);
 INSERT INTO "id_counters" VALUES('PRJ',3);
 INSERT INTO "id_counters" VALUES('DOC',8);
 INSERT INTO "id_counters" VALUES('PRM',4);
+INSERT INTO "id_counters" VALUES('AST',4);
+INSERT INTO "id_counters" VALUES('GNR',4);
 CREATE TABLE inspiration_analyses (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
