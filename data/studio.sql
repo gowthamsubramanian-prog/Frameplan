@@ -555,6 +555,345 @@ INSERT INTO "documents" VALUES('DOC-0009','PRJ-0001','shot_list','main',1,'draft
   }
  ]
 }','main session (shot-planner not built)','2026-11-14T09:04:02Z');
+INSERT INTO "documents" VALUES('DOC-0010','PRJ-0001','shot_list','main',2,'draft','{
+ "project": "PRJ-0001",
+ "based_on": [
+  "DOC-0003",
+  "DOC-0007",
+  "DOC-0009"
+ ],
+ "shooting_order": "by candle set: tall (shots 1-4), half (5-7, 14), stub (8-12); detail (13) at any point",
+ "shots": [
+  {
+   "description": "HOOK, video. Darkness; a match flares and is brought to the first wick on the shoulder piece; the flame catches.",
+   "beat": "hook",
+   "type": "video",
+   "duration_s": 3,
+   "shot_size": "ECU",
+   "body_crop": "hands, match and the two wicks; face out of frame",
+   "camera_angle": "three-quarter from front-left",
+   "camera_height": "shoulder",
+   "composition": "flame centre-right in the 9:16 frame; hands enter from frame left; black around",
+   "camera_movement": "locked",
+   "model_movement": "hand brings the match in, holds, withdraws",
+   "lens": "70mm (or 50mm if the 70 cannot focus this close)",
+   "settings": "4K 25p, 1/50, f/2.8, ISO 1600\u20133200",
+   "candles": "tall; first unlit, then lit",
+   "lighting": "match and flame only at first; key fades up from zero (or set low throughout)",
+   "notes": "Shoot three takes; strike the match out of frame to avoid flare in the lens; shoot with the camera mounted vertically (native 2160x3840)",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "HOOK, still. Close detail of the wick catching, hands soft behind.",
+   "beat": "hook",
+   "type": "still",
+   "shot_size": "ECU",
+   "body_crop": "flame, wick and fingertips",
+   "camera_angle": "side",
+   "camera_height": "shoulder",
+   "composition": "flame on a third; fingertips soft",
+   "camera_movement": "n/a",
+   "model_movement": "held",
+   "lens": "70mm",
+   "settings": "RAW, f/2, 1/160, ISO 1600",
+   "candles": "tall",
+   "lighting": "flame, low warm key",
+   "notes": "Stills set frame 1",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "REVEAL, video. Slow push-in over her shoulder: the wax piece and two flames come into frame, then her lowered eyes.",
+   "beat": "reveal",
+   "type": "video",
+   "duration_s": 4,
+   "shot_size": "MCU to CU",
+   "body_crop": "top of head to upper chest, ending at chin to shoulder",
+   "camera_angle": "over-the-shoulder three-quarter profile from behind the candle shoulder",
+   "camera_height": "shoulder",
+   "composition": "subject weighted right; pillar candles soft at left",
+   "camera_movement": "locked on the tripod, camera mounted vertically; slow push-in added in the edit (about 15%)",
+   "model_movement": "eyes lowered to the flames, a slow breath",
+   "lens": "70mm",
+   "settings": "4K 25p, 1/50, f/2, ISO 2000\u20133200",
+   "candles": "tall",
+   "lighting": "full plan: key, cool fill, teal background, pillars",
+   "notes": "The approved look''s signature frame",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "REVEAL, still. Over-the-shoulder three-quarter profile, eyes lowered to the flames.",
+   "beat": "reveal",
+   "type": "still",
+   "shot_size": "MCU",
+   "body_crop": "head to upper chest",
+   "camera_angle": "over-the-shoulder three-quarter profile",
+   "camera_height": "shoulder",
+   "composition": "4:5; subject right two thirds; pillars left third",
+   "camera_movement": "n/a",
+   "model_movement": "held",
+   "lens": "70mm",
+   "settings": "RAW, f/2, 1/160, ISO 2000",
+   "candles": "tall",
+   "lighting": "full plan",
+   "notes": "Stills set frame 2",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "HERO, still. Head back, eyes closed, fingertips resting at her lips; the main image of the set.",
+   "beat": "hero",
+   "type": "still",
+   "shot_size": "CU",
+   "body_crop": "top of head to shoulder; hand in frame",
+   "camera_angle": "three-quarter profile from the candle side",
+   "camera_height": "chin",
+   "composition": "4:5; face upper right; flames lower centre; fingertips leading to the lips",
+   "camera_movement": "n/a",
+   "model_movement": "head back, eyes closed, lips parted, fingertips at lower lip",
+   "lens": "70mm",
+   "settings": "RAW, f/1.8\u20132.2, 1/125, ISO 2500",
+   "candles": "half",
+   "lighting": "full plan; check the cool fill reads on the far cheek",
+   "notes": "Stills set frame 3 (hero). Its pose is close to REF-000001: change the hand and head angle so it is not a copy",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "HERO, video. The same pose held; very slow push-in; flames flicker; one breath.",
+   "beat": "hero",
+   "type": "video",
+   "duration_s": 5,
+   "shot_size": "CU",
+   "body_crop": "top of head to shoulder",
+   "camera_angle": "three-quarter profile from the candle side",
+   "camera_height": "chin",
+   "composition": "as the hero still, 9:16",
+   "camera_movement": "locked, vertical; very slow digital push-in in the edit (about 8%)",
+   "model_movement": "stillness; one slow breath; slight head settle",
+   "lens": "70mm",
+   "settings": "4K 25p, 1/50, f/2, ISO 2500",
+   "candles": "half",
+   "lighting": "full plan",
+   "notes": "Hold 8\u201310 s per take for editing room",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "BREATH, video, part 1. Locked-off medium shot; she sits upright, eyes closed, half candles.",
+   "beat": "breath",
+   "type": "video",
+   "duration_s": 1.5,
+   "shot_size": "MS",
+   "body_crop": "head to waist",
+   "camera_angle": "three-quarter front",
+   "camera_height": "chest",
+   "composition": "locked frame with headroom; candles clearly readable",
+   "camera_movement": "locked \u2014 do not touch the tripod between parts 1 and 2",
+   "model_movement": "upright, still",
+   "lens": "50mm",
+   "settings": "4K 25p, 1/50, f/2.8, ISO 3200",
+   "candles": "half",
+   "lighting": "full plan, unchanged between parts",
+   "notes": "Mark the model''s position with tape; shoot with the camera mounted vertically (native 2160x3840)",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "BREATH, video, part 2. The identical locked frame; candles now stubs; her posture has sunk; she opens her eyes and looks down at the flames.",
+   "beat": "breath",
+   "type": "video",
+   "duration_s": 2,
+   "shot_size": "MS",
+   "body_crop": "head to waist",
+   "camera_angle": "three-quarter front",
+   "camera_height": "chest",
+   "composition": "identical to part 1",
+   "camera_movement": "locked",
+   "model_movement": "shoulders lowered, head tilted, eyes open to the flames",
+   "lens": "50mm",
+   "settings": "as part 1",
+   "candles": "stub (swap the candle set; keep the wax piece in place)",
+   "lighting": "as part 1",
+   "notes": "The hard cut between parts 1 and 2 is the time jump; shoot with the camera mounted vertically (native 2160x3840)",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "BREATH, still. Eyes open, looking down the shoulder at the stub candles.",
+   "beat": "breath",
+   "type": "still",
+   "shot_size": "CU",
+   "body_crop": "face to shoulder",
+   "camera_angle": "three-quarter front",
+   "camera_height": "eye",
+   "composition": "4:5; eyes to flames on a diagonal",
+   "camera_movement": "n/a",
+   "model_movement": "eyes lowered to the flames",
+   "lens": "70mm",
+   "settings": "RAW, f/2, 1/160, ISO 2500",
+   "candles": "stub",
+   "lighting": "full plan",
+   "notes": "Stills set frame 4",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "ENDING, video, slow motion. She blows out one candle; a thread of smoke rises from that wick; the last flame still burns.",
+   "beat": "ending",
+   "type": "video",
+   "duration_s": 3,
+   "shot_size": "CU",
+   "body_crop": "lips to shoulder",
+   "camera_angle": "side",
+   "camera_height": "shoulder",
+   "composition": "the blown-out wick centre frame; smoke rising into black",
+   "camera_movement": "locked",
+   "model_movement": "a single gentle breath out at the nearer candle",
+   "lens": "50mm at 4K 50p (Super 35 crop, about 75mm equivalent), or 70mm at FHD 100p",
+   "settings": "4K 50p or FHD 100p, 1/100, f/2.8, ISO 3200",
+   "candles": "stub",
+   "lighting": "key low; backlight the smoke with a small hard source from behind if available",
+   "notes": "The AI preview put the smoke on the wrong candle; check the source on playback; shoot with the camera mounted vertically (native 2160x3840)",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "ENDING, still. The smoke thread with the last flame still lit.",
+   "beat": "ending",
+   "type": "still",
+   "shot_size": "CU",
+   "body_crop": "lips, shoulder and both candles",
+   "camera_angle": "side",
+   "camera_height": "shoulder",
+   "composition": "4:5; smoke on the upper third",
+   "camera_movement": "n/a",
+   "model_movement": "just after the breath",
+   "lens": "70mm",
+   "settings": "RAW, f/2.8, 1/200, ISO 3200, burst",
+   "candles": "stub",
+   "lighting": "key low, smoke backlight",
+   "notes": "Stills set frame 5",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "ENDING, video. The last flame is blown out; the frame falls to black.",
+   "beat": "ending",
+   "type": "video",
+   "duration_s": 2,
+   "shot_size": "CU",
+   "body_crop": "face and shoulder",
+   "camera_angle": "three-quarter profile",
+   "camera_height": "shoulder",
+   "composition": "face lit only by the last flame",
+   "camera_movement": "locked",
+   "model_movement": "blows the last candle out",
+   "lens": "70mm",
+   "settings": "4K 25p, 1/50, f/2, ISO 3200",
+   "candles": "stub, last one lit",
+   "lighting": "key and fill off for this take; flame only, then black",
+   "notes": "Possible loop seam back to the match strike; decided at rough cut; shoot with the camera mounted vertically (native 2160x3840)",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "DETAIL, still. Hands and wax only: fingers resting on the drips, flames soft above.",
+   "beat": "detail",
+   "type": "still",
+   "shot_size": "ECU",
+   "body_crop": "hand and wax piece",
+   "camera_angle": "top-side",
+   "camera_height": "above shoulder",
+   "composition": "4:5; drips leading lines down the frame",
+   "camera_movement": "n/a",
+   "model_movement": "fingers resting lightly on the wax",
+   "lens": "70mm",
+   "settings": "RAW, f/2.8, 1/160, ISO 1600",
+   "candles": "any set",
+   "lighting": "key raking across the wax",
+   "notes": "Stills set frame 6",
+   "camera": "Sony A7 IV"
+  },
+  {
+   "description": "WIDE, still. One wider frame of the figure among the pillar candles, for the set''s closing image.",
+   "beat": "detail",
+   "type": "still",
+   "shot_size": "MWS",
+   "body_crop": "head to hips",
+   "camera_angle": "three-quarter front",
+   "camera_height": "chest",
+   "composition": "4:5; figure right; pillars left; more of the teal-black space",
+   "camera_movement": "n/a",
+   "model_movement": "seated, eyes closed",
+   "lens": "50mm",
+   "settings": "RAW, f/2.8, 1/125, ISO 3200",
+   "candles": "half",
+   "lighting": "full plan; open the background light slightly",
+   "notes": "Stills set frame 7",
+   "camera": "Sony A7 IV"
+  }
+ ],
+ "kit_note": "v2: lenses and support changed to the owner''s kit (no 85mm, no slider). 70mm assumed to be a prime; confirm."
+}','main session (shot-planner not built)','2026-11-14T09:12:33Z');
+INSERT INTO "documents" VALUES('DOC-0011','PRJ-0001','production_plan','main',1,'draft','# Production plan — "Vigil" (PRJ-0001)
+
+Shoot: tomorrow, owner''s home studio. Crew: the owner (photographer) and the model only.
+Built on the storyboard (DOC-0008) and shot list v2 (owner''s kit). The model''s name is kept out
+of this public repository.
+
+## Kit mapping (owner''s kit; two items need confirming)
+
+| Role | Owner''s kit | Setting |
+|---|---|---|
+| Camera | Sony A7 IV, on tripod, **mounted vertically for video** | As shot list |
+| Main lens | 70mm (assumed prime) | Hero, reveal, close-ups |
+| Second lens | 50mm | Locked-off time jump, smoke in 4K 50p crop |
+| Wide | 28–75mm | Wide still, backup push-in |
+| Not used | 35mm APS-C | Forces APS-C crop on the A7 IV; not needed |
+| Key (video and stills) | YRGB 500W, assumed a 500 W RGB COB, in a softbox | 2700–3200 K at its lowest output; **if it will not dim low enough, add diffusion and move it back, or bounce it** |
+| Key, stills alternative | AD300Pro flash with a CTO gel in the softbox | Low power; cleaner, sharper stills at ISO 400–800 with the flames still visible (shutter 1/30–1/60) |
+| Cool fill | Cinepeer RGB | ~6500 K or teal, very low, camera right, flagged with black card |
+| Background teal | Z1PRO, **if it is an RGB or coloured light** | Teal on the backdrop, not the model |
+| Practicals | Candles on the shoulder piece; two pillar candles 1–1.5 m behind | Real flame |
+
+No slider or gimbal is listed, so every push-in is done in the edit from vertical 4K
+(native 2160×3840, plenty of room for a 1080×1920 reel).
+
+## Tonight: prepare
+
+1. **Build the wax shoulder piece tonight.** Pour or layer wax (or hot glue) on a rigid shoulder pad
+   or foam cap, build the drips, set the two candle sockets, and let it cure fully. Add a strap under
+   the arm with a **quick-release buckle** so it comes off in one movement.
+2. Cut three candle sets for the sockets: **tall, half, stub**. Short, wide, dripless candles burn
+   cooler and steadier; the drips are part of the prop.
+3. Check stock: matches, a long lighter, a snuffer, two pillar candles with stable holders, black
+   card flags, clamps, tape for floor marks, a spare set of candles.
+4. **Safety stock (needed before any flame is lit):** a fire blanket, a small extinguisher, and a damp
+   towel, all placed beside the tripod.
+5. Charge camera batteries and the lights; format cards.
+
+## Tomorrow: schedule (from the start time)
+
+| Time | Block | Detail |
+|---|---|---|
+| 0:00 | Set up | Backdrop, key, fill, background light, pillar candles, tripod, floor marks |
+| 0:40 | Tests | White balance (fixed ~3800–4500 K), flicker test at 1/50 and 1/100, exposure with the flames lit |
+| 0:55 | Model ready | Hair tied back on the candle side, **no hairspray**; makeup; fit the prop |
+| 1:10 | **Tall set** — shots 1–4 | Hook match strike, reveal |
+| 1:35 | Swap to **half set** — shots 5–7, 14 | Hero still and video, time jump part 1, wide still |
+| 2:05 | Swap to **stub set** — shots 8–12 | Time jump part 2 (do not move the tripod), stubs, smoke slow motion, final blow-out |
+| 2:35 | Detail — shot 13 | Hands and wax |
+| 2:45 | Review and wrap | Check focus, smoke source, the cool fill on playback |
+
+## Real flames with no assistant — read before tomorrow
+
+The storyboard assumed an assistant on fire watch. There is none, so the photographer is the fire
+watch, and the plan changes to suit:
+
+- The camera stays on the tripod and fires by remote (the Sony Creators'' App on your phone, or a
+  remote) so you can stand close to the model, not behind the viewfinder, while flames are lit.
+- **Flames are lit only for the take**, at most about a minute, and snuffed between takes and before
+  every adjustment, candle swap and pose change.
+- Fire blanket, extinguisher and damp towel stay **within one step of where you stand**.
+- The model can release the strap herself; agree a stop word before the first light.
+- Never leave the room, or turn your back on the model, while a flame is lit.
+- If anything leans, pools near skin or catches hair: snuff, release the strap, blanket.
+
+**Recommendation:** a second person for the forty or so minutes of lit shots would make this
+markedly safer, even someone with no photography role. This is production guidance, not a
+substitute for your own judgement or any building fire rules.
+','main session (shot-planner not built)','2026-11-14T09:12:34Z');
 CREATE TABLE gate_log (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   at         TEXT NOT NULL,
@@ -614,11 +953,11 @@ INSERT INTO "id_counters" VALUES('INS',3);
 INSERT INTO "id_counters" VALUES('RSH',3);
 INSERT INTO "id_counters" VALUES('APR',6);
 INSERT INTO "id_counters" VALUES('PRJ',3);
-INSERT INTO "id_counters" VALUES('DOC',10);
+INSERT INTO "id_counters" VALUES('DOC',12);
 INSERT INTO "id_counters" VALUES('PRM',4);
 INSERT INTO "id_counters" VALUES('AST',4);
 INSERT INTO "id_counters" VALUES('GNR',4);
-INSERT INTO "id_counters" VALUES('SHO',15);
+INSERT INTO "id_counters" VALUES('SHO',29);
 CREATE TABLE inspiration_analyses (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
@@ -721,7 +1060,7 @@ CREATE TABLE projects (
   created_at   TEXT NOT NULL,
   updated_at   TEXT NOT NULL
 );
-INSERT INTO "projects" VALUES('PRJ-0001','Candle portrait shoot','B','shot_list','active','Candle-themed portrait shoot from two saved references (REF-000001, REF-000002). Owner decision 13 Nov 2026: use REAL candles, not LED with composited flames. Plan the prop, hair styling and safety measures around live flame. No source links or creators beyond the Cap2red Studio watermark on REF-000001.',NULL,10.0,'2026-11-13T20:57:42Z','2026-11-14T09:04:02Z');
+INSERT INTO "projects" VALUES('PRJ-0001','Candle portrait shoot','B','production_plan','active','Candle-themed portrait shoot from two saved references (REF-000001, REF-000002). Owner decision 13 Nov 2026: use REAL candles, not LED with composited flames. Plan the prop, hair styling and safety measures around live flame. No source links or creators beyond the Cap2red Studio watermark on REF-000001.',NULL,10.0,'2026-11-13T20:57:42Z','2026-11-14T09:12:33Z');
 INSERT INTO "projects" VALUES('PRJ-0002','Why forklift and pedestrian segregation matters','E','proposal','cancelled','Motion Director test run 1 (skill default path: WHS/HSE, LinkedIn, 9:16). Title chosen by Claude from the skill''s own example; owner may substitute.',NULL,10.0,'2026-11-13T21:05:54Z','2026-11-13T21:10:33Z');
 CREATE TABLE prompts (
   id         TEXT PRIMARY KEY,                 -- PRM-0001
@@ -808,6 +1147,20 @@ INSERT INTO "shots" VALUES('SHO-0011','PRJ-0001','DOC-0009',11,NULL,'ENDING, sti
 INSERT INTO "shots" VALUES('SHO-0012','PRJ-0001','DOC-0009',12,NULL,'ENDING, video. The last flame is blown out; the frame falls to black.','{"beat": "ending", "type": "video", "duration_s": 2, "shot_size": "CU", "body_crop": "face and shoulder", "camera_angle": "three-quarter profile", "camera_height": "shoulder", "composition": "face lit only by the last flame", "camera_movement": "locked", "model_movement": "blows the last candle out", "lens": "85mm", "settings": "4K 25p, 1/50, f/2, ISO 3200", "candles": "stub, last one lit", "lighting": "key and fill off for this take; flame only, then black", "notes": "Possible loop seam back to the match strike; decided at rough cut", "camera": "Sony A7 IV"}');
 INSERT INTO "shots" VALUES('SHO-0013','PRJ-0001','DOC-0009',13,NULL,'DETAIL, still. Hands and wax only: fingers resting on the drips, flames soft above.','{"beat": "detail", "type": "still", "shot_size": "ECU", "body_crop": "hand and wax piece", "camera_angle": "top-side", "camera_height": "above shoulder", "composition": "4:5; drips leading lines down the frame", "camera_movement": "n/a", "model_movement": "fingers resting lightly on the wax", "lens": "85mm", "settings": "RAW, f/2.8, 1/160, ISO 1600", "candles": "any set", "lighting": "key raking across the wax", "notes": "Stills set frame 6", "camera": "Sony A7 IV"}');
 INSERT INTO "shots" VALUES('SHO-0014','PRJ-0001','DOC-0009',14,NULL,'WIDE, still. One wider frame of the figure among the pillar candles, for the set''s closing image.','{"beat": "detail", "type": "still", "shot_size": "MWS", "body_crop": "head to hips", "camera_angle": "three-quarter front", "camera_height": "chest", "composition": "4:5; figure right; pillars left; more of the teal-black space", "camera_movement": "n/a", "model_movement": "seated, eyes closed", "lens": "50mm", "settings": "RAW, f/2.8, 1/125, ISO 3200", "candles": "half", "lighting": "full plan; open the background light slightly", "notes": "Stills set frame 7", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0015','PRJ-0001','DOC-0010',1,NULL,'HOOK, video. Darkness; a match flares and is brought to the first wick on the shoulder piece; the flame catches.','{"beat": "hook", "type": "video", "duration_s": 3, "shot_size": "ECU", "body_crop": "hands, match and the two wicks; face out of frame", "camera_angle": "three-quarter from front-left", "camera_height": "shoulder", "composition": "flame centre-right in the 9:16 frame; hands enter from frame left; black around", "camera_movement": "locked", "model_movement": "hand brings the match in, holds, withdraws", "lens": "70mm (or 50mm if the 70 cannot focus this close)", "settings": "4K 25p, 1/50, f/2.8, ISO 1600–3200", "candles": "tall; first unlit, then lit", "lighting": "match and flame only at first; key fades up from zero (or set low throughout)", "notes": "Shoot three takes; strike the match out of frame to avoid flare in the lens; shoot with the camera mounted vertically (native 2160x3840)", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0016','PRJ-0001','DOC-0010',2,NULL,'HOOK, still. Close detail of the wick catching, hands soft behind.','{"beat": "hook", "type": "still", "shot_size": "ECU", "body_crop": "flame, wick and fingertips", "camera_angle": "side", "camera_height": "shoulder", "composition": "flame on a third; fingertips soft", "camera_movement": "n/a", "model_movement": "held", "lens": "70mm", "settings": "RAW, f/2, 1/160, ISO 1600", "candles": "tall", "lighting": "flame, low warm key", "notes": "Stills set frame 1", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0017','PRJ-0001','DOC-0010',3,NULL,'REVEAL, video. Slow push-in over her shoulder: the wax piece and two flames come into frame, then her lowered eyes.','{"beat": "reveal", "type": "video", "duration_s": 4, "shot_size": "MCU to CU", "body_crop": "top of head to upper chest, ending at chin to shoulder", "camera_angle": "over-the-shoulder three-quarter profile from behind the candle shoulder", "camera_height": "shoulder", "composition": "subject weighted right; pillar candles soft at left", "camera_movement": "locked on the tripod, camera mounted vertically; slow push-in added in the edit (about 15%)", "model_movement": "eyes lowered to the flames, a slow breath", "lens": "70mm", "settings": "4K 25p, 1/50, f/2, ISO 2000–3200", "candles": "tall", "lighting": "full plan: key, cool fill, teal background, pillars", "notes": "The approved look''s signature frame", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0018','PRJ-0001','DOC-0010',4,NULL,'REVEAL, still. Over-the-shoulder three-quarter profile, eyes lowered to the flames.','{"beat": "reveal", "type": "still", "shot_size": "MCU", "body_crop": "head to upper chest", "camera_angle": "over-the-shoulder three-quarter profile", "camera_height": "shoulder", "composition": "4:5; subject right two thirds; pillars left third", "camera_movement": "n/a", "model_movement": "held", "lens": "70mm", "settings": "RAW, f/2, 1/160, ISO 2000", "candles": "tall", "lighting": "full plan", "notes": "Stills set frame 2", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0019','PRJ-0001','DOC-0010',5,NULL,'HERO, still. Head back, eyes closed, fingertips resting at her lips; the main image of the set.','{"beat": "hero", "type": "still", "shot_size": "CU", "body_crop": "top of head to shoulder; hand in frame", "camera_angle": "three-quarter profile from the candle side", "camera_height": "chin", "composition": "4:5; face upper right; flames lower centre; fingertips leading to the lips", "camera_movement": "n/a", "model_movement": "head back, eyes closed, lips parted, fingertips at lower lip", "lens": "70mm", "settings": "RAW, f/1.8–2.2, 1/125, ISO 2500", "candles": "half", "lighting": "full plan; check the cool fill reads on the far cheek", "notes": "Stills set frame 3 (hero). Its pose is close to REF-000001: change the hand and head angle so it is not a copy", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0020','PRJ-0001','DOC-0010',6,NULL,'HERO, video. The same pose held; very slow push-in; flames flicker; one breath.','{"beat": "hero", "type": "video", "duration_s": 5, "shot_size": "CU", "body_crop": "top of head to shoulder", "camera_angle": "three-quarter profile from the candle side", "camera_height": "chin", "composition": "as the hero still, 9:16", "camera_movement": "locked, vertical; very slow digital push-in in the edit (about 8%)", "model_movement": "stillness; one slow breath; slight head settle", "lens": "70mm", "settings": "4K 25p, 1/50, f/2, ISO 2500", "candles": "half", "lighting": "full plan", "notes": "Hold 8–10 s per take for editing room", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0021','PRJ-0001','DOC-0010',7,NULL,'BREATH, video, part 1. Locked-off medium shot; she sits upright, eyes closed, half candles.','{"beat": "breath", "type": "video", "duration_s": 1.5, "shot_size": "MS", "body_crop": "head to waist", "camera_angle": "three-quarter front", "camera_height": "chest", "composition": "locked frame with headroom; candles clearly readable", "camera_movement": "locked — do not touch the tripod between parts 1 and 2", "model_movement": "upright, still", "lens": "50mm", "settings": "4K 25p, 1/50, f/2.8, ISO 3200", "candles": "half", "lighting": "full plan, unchanged between parts", "notes": "Mark the model''s position with tape; shoot with the camera mounted vertically (native 2160x3840)", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0022','PRJ-0001','DOC-0010',8,NULL,'BREATH, video, part 2. The identical locked frame; candles now stubs; her posture has sunk; she opens her eyes and looks down at the flames.','{"beat": "breath", "type": "video", "duration_s": 2, "shot_size": "MS", "body_crop": "head to waist", "camera_angle": "three-quarter front", "camera_height": "chest", "composition": "identical to part 1", "camera_movement": "locked", "model_movement": "shoulders lowered, head tilted, eyes open to the flames", "lens": "50mm", "settings": "as part 1", "candles": "stub (swap the candle set; keep the wax piece in place)", "lighting": "as part 1", "notes": "The hard cut between parts 1 and 2 is the time jump; shoot with the camera mounted vertically (native 2160x3840)", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0023','PRJ-0001','DOC-0010',9,NULL,'BREATH, still. Eyes open, looking down the shoulder at the stub candles.','{"beat": "breath", "type": "still", "shot_size": "CU", "body_crop": "face to shoulder", "camera_angle": "three-quarter front", "camera_height": "eye", "composition": "4:5; eyes to flames on a diagonal", "camera_movement": "n/a", "model_movement": "eyes lowered to the flames", "lens": "70mm", "settings": "RAW, f/2, 1/160, ISO 2500", "candles": "stub", "lighting": "full plan", "notes": "Stills set frame 4", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0024','PRJ-0001','DOC-0010',10,NULL,'ENDING, video, slow motion. She blows out one candle; a thread of smoke rises from that wick; the last flame still burns.','{"beat": "ending", "type": "video", "duration_s": 3, "shot_size": "CU", "body_crop": "lips to shoulder", "camera_angle": "side", "camera_height": "shoulder", "composition": "the blown-out wick centre frame; smoke rising into black", "camera_movement": "locked", "model_movement": "a single gentle breath out at the nearer candle", "lens": "50mm at 4K 50p (Super 35 crop, about 75mm equivalent), or 70mm at FHD 100p", "settings": "4K 50p or FHD 100p, 1/100, f/2.8, ISO 3200", "candles": "stub", "lighting": "key low; backlight the smoke with a small hard source from behind if available", "notes": "The AI preview put the smoke on the wrong candle; check the source on playback; shoot with the camera mounted vertically (native 2160x3840)", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0025','PRJ-0001','DOC-0010',11,NULL,'ENDING, still. The smoke thread with the last flame still lit.','{"beat": "ending", "type": "still", "shot_size": "CU", "body_crop": "lips, shoulder and both candles", "camera_angle": "side", "camera_height": "shoulder", "composition": "4:5; smoke on the upper third", "camera_movement": "n/a", "model_movement": "just after the breath", "lens": "70mm", "settings": "RAW, f/2.8, 1/200, ISO 3200, burst", "candles": "stub", "lighting": "key low, smoke backlight", "notes": "Stills set frame 5", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0026','PRJ-0001','DOC-0010',12,NULL,'ENDING, video. The last flame is blown out; the frame falls to black.','{"beat": "ending", "type": "video", "duration_s": 2, "shot_size": "CU", "body_crop": "face and shoulder", "camera_angle": "three-quarter profile", "camera_height": "shoulder", "composition": "face lit only by the last flame", "camera_movement": "locked", "model_movement": "blows the last candle out", "lens": "70mm", "settings": "4K 25p, 1/50, f/2, ISO 3200", "candles": "stub, last one lit", "lighting": "key and fill off for this take; flame only, then black", "notes": "Possible loop seam back to the match strike; decided at rough cut; shoot with the camera mounted vertically (native 2160x3840)", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0027','PRJ-0001','DOC-0010',13,NULL,'DETAIL, still. Hands and wax only: fingers resting on the drips, flames soft above.','{"beat": "detail", "type": "still", "shot_size": "ECU", "body_crop": "hand and wax piece", "camera_angle": "top-side", "camera_height": "above shoulder", "composition": "4:5; drips leading lines down the frame", "camera_movement": "n/a", "model_movement": "fingers resting lightly on the wax", "lens": "70mm", "settings": "RAW, f/2.8, 1/160, ISO 1600", "candles": "any set", "lighting": "key raking across the wax", "notes": "Stills set frame 6", "camera": "Sony A7 IV"}');
+INSERT INTO "shots" VALUES('SHO-0028','PRJ-0001','DOC-0010',14,NULL,'WIDE, still. One wider frame of the figure among the pillar candles, for the set''s closing image.','{"beat": "detail", "type": "still", "shot_size": "MWS", "body_crop": "head to hips", "camera_angle": "three-quarter front", "camera_height": "chest", "composition": "4:5; figure right; pillars left; more of the teal-black space", "camera_movement": "n/a", "model_movement": "seated, eyes closed", "lens": "50mm", "settings": "RAW, f/2.8, 1/125, ISO 3200", "candles": "half", "lighting": "full plan; open the background light slightly", "notes": "Stills set frame 7", "camera": "Sony A7 IV"}');
 CREATE TABLE stage_history (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   project_id TEXT NOT NULL REFERENCES projects(id),
@@ -826,6 +1179,7 @@ INSERT INTO "stage_history" VALUES(7,'PRJ-0001','analysis','technique_extraction
 INSERT INTO "stage_history" VALUES(8,'PRJ-0001','technique_extraction','adaptation',NULL,'2026-11-13T21:11:33Z');
 INSERT INTO "stage_history" VALUES(9,'PRJ-0001','adaptation','storyboard','concept A approved (APR-0003); style 1 blended with 2 approved (APR-0004)','2026-11-13T21:41:18Z');
 INSERT INTO "stage_history" VALUES(10,'PRJ-0001','storyboard','shot_list','storyboard v1 drafted','2026-11-14T09:04:02Z');
+INSERT INTO "stage_history" VALUES(11,'PRJ-0001','shot_list','production_plan','shot list v2 fitted to the owner''s kit','2026-11-14T09:12:33Z');
 CREATE TABLE technique_shots (
   technique_id      TEXT NOT NULL REFERENCES shot_manifest(id),
   reference_shot_id TEXT NOT NULL REFERENCES reference_shots(id),
