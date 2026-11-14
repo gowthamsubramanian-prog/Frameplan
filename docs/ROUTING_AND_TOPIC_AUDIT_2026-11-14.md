@@ -169,3 +169,11 @@ Nothing in `.claude/` refers to it.
 **Will the routing rules carry forward?** Yes. They live in `CLAUDE.md`, `studio.py` and the
 hooks, none of which the Creative Director replaces. Section 0 of the `studio` skill is the one
 part that would be rewritten; an amendment to the specification now requires it to be kept.
+
+## Follow-up fix, 14 November 2026
+
+"Start the storyboard and shot list" on the candle project was flagged by the context hook as a
+request for the reference-video Storyboard skill: the word "storyboard" alone matched that
+specialist, although it is also a stage name. The coordinator overrode the flag (the owner had
+been offered exactly that next step) and fixed the pattern: only "cinematic-reel-storyboard",
+"reel storyboard" or "storyboard skill" now names the specialist. A regression test was added.

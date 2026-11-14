@@ -137,11 +137,21 @@ class TestEntryPoints(Base):
         self.assertIn("candle rituals", r["input_detected"]["text"])
 
     def test_named_specialist_that_does_not_fit_the_attachment_is_flagged(self):
-        r = self.ok("route", "storyboard this", "--attachment", "photo.jpg")
+        r = self.ok("route", "use the cinematic-reel-storyboard skill on this", "--attachment", "photo.jpg")
         self.assertEqual(r["action"], "clarify"); self.assertIn("incompatible_specialist", r["flags"])
         self.assertIn("Do not change the subject to suit the specialist", r["needs_clarification"])
-        r = self.ok("route", "storyboard this", "--attachment", "reel.mp4")
+        r = self.ok("route", "use the cinematic-reel-storyboard skill on this", "--attachment", "reel.mp4")
         self.assertEqual((r["action"], r["first_specialist"]), ("new_work", "cinematic-reel-storyboard"))
+
+    def test_storyboard_as_a_stage_is_not_a_request_for_the_storyboard_skill(self):
+        """Regression, 14 Nov 2026: 'Start the storyboard and shot list' on the candle project was
+        wrongly flagged as asking for the reference-video Storyboard skill."""
+        self.candle_project()
+        for words in ("Start the storyboard and shot list", "do the storyboard", "storyboard next please"):
+            r = self.ok("route", words)
+            self.assertNotEqual(r["action"], "clarify", words)
+            self.assertIsNone(r["named_specialist"], words)
+            self.assertNotIn("incompatible_specialist", r["flags"], words)
 
     # ---- E8 nothing at all
     def test_empty_input_is_refused(self):

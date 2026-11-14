@@ -276,7 +276,9 @@ NO_DEFAULTS = ("The subject is whatever the owner supplied. Never substitute a s
 # name pattern, what it needs, workflows it fits
 SPECIALISTS = {
     "motion-director": (r"motion[- ]?director", "a title or subject for a motion-graphics piece", {"E"}),
-    "cinematic-reel-storyboard": (r"storyboard", "a reference video", {"C"}),
+    # "storyboard" alone is also a stage name; only the skill's own name, or "storyboard skill", names the specialist
+    "cinematic-reel-storyboard": (r"cinematic[- ]reel[- ]storyboard|storyboard (skill|specialist|agent)|reel storyboard",
+                                  "a reference video", {"C"}),
     "inspiration-intelligence": (r"agent ?00|inspiration[- ]intelligence", "a reference: an image, video or link", {"B", "C"}),
     "generation-director": (r"generation[- ]?director", "a project with an approved concept", {"A", "B", "D"}),
     "qa-reviewer": (r"qa[- ]?reviewer|quality review", "an output file to review", {"A", "B", "D", "E"}),
