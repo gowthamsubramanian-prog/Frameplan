@@ -44,7 +44,7 @@ CREATE TABLE approvals (
 INSERT INTO "approvals" VALUES('APR-0001',NULL,'manifest_update','RSH-0001,RSH-0002','2 reference shot(s)','approved',NULL,NULL,NULL,0,'1. Approve','2026-11-13T20:57:42Z','2026-11-13T20:57:42Z');
 INSERT INTO "approvals" VALUES('APR-0002','PRJ-0002','concept','DOC-0002','IDEA APPROVAL: The line that never stopped a forklift (30 s, three beats)','rejected',NULL,NULL,NULL,0,'STOP. Do not approve or continue the forklift safety concept. The test has failed its input relevance requirement.','2026-11-13T21:05:55Z','2026-11-13T21:10:33Z');
 INSERT INTO "approvals" VALUES('APR-0003','PRJ-0001','concept','DOC-0003,DOC-0004,DOC-0005','Choose one of three candle-portrait concepts: A Vigil, B The Candle-Bearer, C Offering','approved',NULL,NULL,NULL,0,'I accept the amendment, keep the items, approve concept A','2026-11-13T21:11:33Z','2026-11-13T21:35:44Z');
-INSERT INTO "approvals" VALUES('APR-0004','PRJ-0001','style','DOC-0006','Choose a style treatment for Vigil: 1 Ember, 2 Cold Hours, 3 Until Dawn','pending',NULL,NULL,NULL,0,NULL,'2026-11-13T21:35:44Z',NULL);
+INSERT INTO "approvals" VALUES('APR-0004','PRJ-0001','style','DOC-0006','Choose a style treatment for Vigil: 1 Ember, 2 Cold Hours, 3 Until Dawn','approved',NULL,NULL,NULL,0,'Approve 1 and blend 2 in. I do prefer some AI generated images','2026-11-13T21:35:44Z','2026-11-13T21:41:18Z');
 CREATE TABLE assets (
   id           TEXT PRIMARY KEY,               -- AST-0001
   project_id   TEXT REFERENCES projects(id),
@@ -159,7 +159,7 @@ INSERT INTO "documents" VALUES('DOC-0005','PRJ-0001','concept','C',1,'rejected',
 **Real-flame demands:** the most open flame of the three: many candles on stable holders with clear floor around them, a taper for lighting, a fire blanket and extinguisher on set, hair tied back for the shoulder-lighting shot.
 **Difficulty:** medium.
 ','main session (Creative Director role not installed)','2026-11-13T21:11:33Z');
-INSERT INTO "documents" VALUES('DOC-0006','PRJ-0001','style_options','main',1,'draft','# Style treatments for Concept A "Vigil" (approved, DOC-0003)
+INSERT INTO "documents" VALUES('DOC-0006','PRJ-0001','style_options','main',1,'approved','# Style treatments for Concept A "Vigil" (approved, DOC-0003)
 
 Reference boards are internal working material and are never published or included in final output.
 The catalog holds two references, so only treatments 1 and 2 have a reference behind them; treatment 3 has none.
@@ -193,6 +193,26 @@ The catalog holds two references, so only treatments 1 and 2 have a reference be
 
 Recommended: 3, Until Dawn, because it is the only treatment where the look itself tells the vigil''s story (the light changes as the night passes). If its difficulty is not wanted, 1 is the safest to execute.
 ','main session (Creative Director role not installed)','2026-11-13T21:35:44Z');
+INSERT INTO "documents" VALUES('DOC-0007','PRJ-0001','creative_direction','main',1,'draft','# Approved look for "Vigil": Ember, with Cold Hours blended in
+
+Owner''s decision, 14 Nov 2026: "Approve 1 and blend 2 in." What is taken from each is Claude''s
+interpretation of the blend and is open to correction.
+
+**From Ember (base, REF-000001):**
+- Warm, low-key light on the face, neck and hands; real candle flames as visible practicals.
+- Amber skin, cream wax, lifted matte blacks, fine grain.
+- Tight over-the-shoulder three-quarter profile, 4:5, shallow depth of field, blurred pillar candles behind.
+- Very slow push-ins; long holds joined by slow dissolves, each landing on shorter candles.
+
+**Blended in from Cold Hours (REF-000002):**
+- Background and shadow side pushed cool: teal-black instead of olive-black, so the warm flame-lit side stands out.
+- A faint cool fill on the far side of the face, giving a warm–cool split.
+- One locked-off repeated frame used as a time-jump device at the midpoint, where only the candle height and her posture change.
+
+**Not taken from Cold Hours:** the saturated neon-orange cheek patch, and true clipped blacks. Ember''s matte finish is kept.
+
+**Reference boards are internal only and never published.**
+','main session (Creative Director role not installed)','2026-11-13T21:41:18Z');
 CREATE TABLE gate_log (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   at         TEXT NOT NULL,
@@ -246,7 +266,8 @@ INSERT INTO "id_counters" VALUES('INS',3);
 INSERT INTO "id_counters" VALUES('RSH',3);
 INSERT INTO "id_counters" VALUES('APR',5);
 INSERT INTO "id_counters" VALUES('PRJ',3);
-INSERT INTO "id_counters" VALUES('DOC',7);
+INSERT INTO "id_counters" VALUES('DOC',8);
+INSERT INTO "id_counters" VALUES('PRM',4);
 CREATE TABLE inspiration_analyses (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   inspiration_id TEXT NOT NULL REFERENCES inspirations(id),
@@ -349,7 +370,7 @@ CREATE TABLE projects (
   created_at   TEXT NOT NULL,
   updated_at   TEXT NOT NULL
 );
-INSERT INTO "projects" VALUES('PRJ-0001','Candle portrait shoot','B','adaptation','active','Candle-themed portrait shoot from two saved references (REF-000001, REF-000002). Owner decision 13 Nov 2026: use REAL candles, not LED with composited flames. Plan the prop, hair styling and safety measures around live flame. No source links or creators beyond the Cap2red Studio watermark on REF-000001.',NULL,10.0,'2026-11-13T20:57:42Z','2026-11-13T21:11:33Z');
+INSERT INTO "projects" VALUES('PRJ-0001','Candle portrait shoot','B','storyboard','active','Candle-themed portrait shoot from two saved references (REF-000001, REF-000002). Owner decision 13 Nov 2026: use REAL candles, not LED with composited flames. Plan the prop, hair styling and safety measures around live flame. No source links or creators beyond the Cap2red Studio watermark on REF-000001.',NULL,10.0,'2026-11-13T20:57:42Z','2026-11-13T21:41:18Z');
 INSERT INTO "projects" VALUES('PRJ-0002','Why forklift and pedestrian segregation matters','E','proposal','cancelled','Motion Director test run 1 (skill default path: WHS/HSE, LinkedIn, 9:16). Title chosen by Claude from the skill''s own example; owner may substitute.',NULL,10.0,'2026-11-13T21:05:54Z','2026-11-13T21:10:33Z');
 CREATE TABLE prompts (
   id         TEXT PRIMARY KEY,                 -- PRM-0001
@@ -363,6 +384,9 @@ CREATE TABLE prompts (
   parent_id  TEXT REFERENCES prompts(id),      -- refinement chain
   created_at TEXT NOT NULL
 );
+INSERT INTO "prompts" VALUES('PRM-0001','PRJ-0001',NULL,'idea_ai','seedream_4_5','image','Cinematic still photograph at night. Close-up of an adult woman''s hands striking a long match and lighting the first of two tall white candles set in a sculpted mass of white dripped wax on her bare shoulder; her face is only partly lit, eyes lowered to the flame. Warm amber candlelight on hands, jaw and neck; a faint cool fill on the far side of her face; teal-black background with two out-of-focus lit pillar candles. Lifted matte blacks, fine film grain, shallow depth of field, 85mm portrait look, vertical 4:5. Real photography, natural skin texture, accurate hands with five fingers, no text, no watermark, single image, not a collage.','{"purpose":"style preview for the approved Ember+Cold Hours look","beat":1,"aspect_ratio":"4:5","quote_coins":690}',NULL,'2026-11-14T01:42:05Z');
+INSERT INTO "prompts" VALUES('PRM-0002','PRJ-0001',NULL,'idea_ai','seedream_4_5','image','Cinematic still photograph at night. Over-the-shoulder three-quarter profile of an adult woman, head tilted back, eyes closed, fingertips resting at her lips. A sculpted mass of white dripped candle wax sits on her bare near shoulder with two lit candles, now burned halfway down. Warm amber candlelight on her jaw, neck and hand; a faint cool fill on the far side of her face; teal-black background with two out-of-focus lit pillar candles. Lifted matte blacks, fine film grain, shallow depth of field, 85mm portrait look, vertical 4:5. Real photography, natural skin texture, accurate hands with five fingers, no text, no watermark, single image, not a collage.','{"purpose":"style preview for the approved Ember+Cold Hours look","beat":2,"aspect_ratio":"4:5","quote_coins":690}',NULL,'2026-11-14T01:42:05Z');
+INSERT INTO "prompts" VALUES('PRM-0003','PRJ-0001',NULL,'idea_ai','seedream_4_5','image','Cinematic still photograph at night. Three-quarter profile of an adult woman looking down at her bare shoulder, where a sculpted mass of white dripped wax holds two candles burned almost to stubs; she has just blown one out and a thin thread of smoke rises while the last small flame still burns. Dim warm amber light on her face from the remaining flame; cool teal-black shadows; two out-of-focus pillar candles behind, one extinguished. Lifted matte blacks, fine film grain, shallow depth of field, 85mm portrait look, vertical 4:5. Real photography, natural skin texture, accurate hands with five fingers, no text, no watermark, single image, not a collage.','{"purpose":"style preview for the approved Ember+Cold Hours look","beat":3,"aspect_ratio":"4:5","quote_coins":690}',NULL,'2026-11-14T01:42:05Z');
 CREATE TABLE publications (
   id          TEXT PRIMARY KEY,                -- PUB-0001
   project_id  TEXT NOT NULL REFERENCES projects(id),
@@ -435,6 +459,7 @@ INSERT INTO "stage_history" VALUES(5,'PRJ-0002','proposal','proposal','status ->
 INSERT INTO "stage_history" VALUES(6,'PRJ-0001','ingest','analysis',NULL,'2026-11-13T21:11:33Z');
 INSERT INTO "stage_history" VALUES(7,'PRJ-0001','analysis','technique_extraction',NULL,'2026-11-13T21:11:33Z');
 INSERT INTO "stage_history" VALUES(8,'PRJ-0001','technique_extraction','adaptation',NULL,'2026-11-13T21:11:33Z');
+INSERT INTO "stage_history" VALUES(9,'PRJ-0001','adaptation','storyboard','concept A approved (APR-0003); style 1 blended with 2 approved (APR-0004)','2026-11-13T21:41:18Z');
 CREATE TABLE technique_shots (
   technique_id      TEXT NOT NULL REFERENCES shot_manifest(id),
   reference_shot_id TEXT NOT NULL REFERENCES reference_shots(id),
