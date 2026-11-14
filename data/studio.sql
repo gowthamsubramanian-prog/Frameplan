@@ -894,6 +894,85 @@ watch, and the plan changes to suit:
 markedly safer, even someone with no photography role. This is production guidance, not a
 substitute for your own judgement or any building fire rules.
 ','main session (shot-planner not built)','2026-11-14T09:12:34Z');
+INSERT INTO "documents" VALUES('DOC-0012','PRJ-0001','production_plan','main',2,'draft','# Production plan — "Vigil" (PRJ-0001)
+
+Shoot: tomorrow, owner''s home studio. Crew: the owner (photographer) and the model only.
+Built on the storyboard (DOC-0008) and shot list v2 (owner''s kit). The model''s name is kept out
+of this public repository.
+
+## Kit mapping (owner''s kit; two items need confirming)
+
+| Role | Owner''s kit | Setting |
+|---|---|---|
+| Camera | Sony A7 IV, on tripod, **mounted vertically for video** | As shot list |
+| Main lens | 70mm (assumed prime) | Hero, reveal, close-ups |
+| Second lens | 50mm | Locked-off time jump, smoke in 4K 50p crop |
+| Wide | 28–75mm | Wide still, backup push-in |
+| Not used | 35mm APS-C | Forces APS-C crop on the A7 IV; not needed |
+| Key (video and stills) | YRGB 500W, assumed a 500 W RGB COB, in a softbox | 2700–3200 K at its lowest output; **if it will not dim low enough, add diffusion and move it back, or bounce it** |
+| Key, stills alternative | AD300Pro flash with a CTO gel in the softbox | Low power; cleaner, sharper stills at ISO 400–800 with the flames still visible (shutter 1/30–1/60) |
+| Cool fill | Cinepeer RGB | ~6500 K or teal, very low, camera right, flagged with black card |
+| Background teal | Z1PRO, **if it is an RGB or coloured light** | Teal on the backdrop, not the model |
+| Practicals | Candles on the shoulder piece; two pillar candles 1–1.5 m behind | Real flame |
+
+No slider or gimbal is listed, so every push-in is done in the edit from vertical 4K
+(native 2160×3840, plenty of room for a 1080×1920 reel).
+
+## Before the shoot: prepare (owner cannot cure a prop overnight)
+
+The prop is built on the morning of the shoot, off the model, from materials that set in minutes.
+
+1. **Base:** a rigid shoulder cap (a foam shoulder pad, or a cut plastic cup or bottle shaped to the
+   shoulder) with a layer of folded fabric or cork underneath as heat insulation. Strap under the arm
+   with a **quick-release buckle**.
+2. **Candle sockets:** two aluminium tea-light cups glued to the top of the base. Each candle set sits
+   in the cups, so molten wax and the flame''s heat stay in metal, never on glue or skin, and the
+   tall, half and stub sets swap in seconds.
+3. **Drips (about 30 minutes):** run hot glue down from the sockets over the base in long, uneven
+   drips; it sets in a minute or two and reads as wax on camera. Finish the area right around the
+   cups with real wax dripped from a spare lit candle onto the prop (thin layers set in minutes).
+   Keep glue away from the cups: it softens with heat.
+4. **Test:** with the prop on a table, light the stub set for two minutes and check that nothing near
+   the cups softens or smokes before it goes on the model.
+5. Candles: three sets (tall, half, stub) cut to fit the cups; short, wide, dripless.
+6. Check stock: matches, a long lighter, a snuffer, two pillar candles with stable holders, black
+   card flags, clamps, tape for floor marks, a spare set of candles, hot glue gun and sticks, tea-light cups.
+7. **Safety stock (needed before any flame is lit):** a fire blanket, a small extinguisher, and a damp
+   towel, all placed beside the tripod.
+8. Charge camera batteries and the lights; format cards.
+
+## Tomorrow: schedule (from the start time)
+
+| Time | Block | Detail |
+|---|---|---|
+| −1:00 | Build the prop | Base, sockets, glue drips, wax around the cups; 15 minutes to cool; table burn test |
+| 0:00 | Set up | Backdrop, key, fill, background light, pillar candles, tripod, floor marks |
+| 0:40 | Tests | White balance (fixed ~3800–4500 K), flicker test at 1/50 and 1/100, exposure with the flames lit |
+| 0:55 | Model ready | Hair tied back on the candle side, **no hairspray**; makeup; fit the prop |
+| 1:10 | **Tall set** — shots 1–4 | Hook match strike, reveal |
+| 1:35 | Swap to **half set** — shots 5–7, 14 | Hero still and video, time jump part 1, wide still |
+| 2:05 | Swap to **stub set** — shots 8–12 | Time jump part 2 (do not move the tripod), stubs, smoke slow motion, final blow-out |
+| 2:35 | Detail — shot 13 | Hands and wax |
+| 2:45 | Review and wrap | Check focus, smoke source, the cool fill on playback |
+
+## Real flames with no assistant — read before tomorrow
+
+The storyboard assumed an assistant on fire watch. There is none, so the photographer is the fire
+watch, and the plan changes to suit:
+
+- The camera stays on the tripod and fires by remote (the Sony Creators'' App on your phone, or a
+  remote) so you can stand close to the model, not behind the viewfinder, while flames are lit.
+- **Flames are lit only for the take**, at most about a minute, and snuffed between takes and before
+  every adjustment, candle swap and pose change.
+- Fire blanket, extinguisher and damp towel stay **within one step of where you stand**.
+- The model can release the strap herself; agree a stop word before the first light.
+- Never leave the room, or turn your back on the model, while a flame is lit.
+- If anything leans, pools near skin or catches hair: snuff, release the strap, blanket.
+
+**Recommendation:** a second person for the forty or so minutes of lit shots would make this
+markedly safer, even someone with no photography role. This is production guidance, not a
+substitute for your own judgement or any building fire rules.
+','main session (shot-planner not built)','2026-11-14T09:18:58Z');
 CREATE TABLE gate_log (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   at         TEXT NOT NULL,
@@ -953,7 +1032,7 @@ INSERT INTO "id_counters" VALUES('INS',3);
 INSERT INTO "id_counters" VALUES('RSH',3);
 INSERT INTO "id_counters" VALUES('APR',6);
 INSERT INTO "id_counters" VALUES('PRJ',3);
-INSERT INTO "id_counters" VALUES('DOC',12);
+INSERT INTO "id_counters" VALUES('DOC',13);
 INSERT INTO "id_counters" VALUES('PRM',4);
 INSERT INTO "id_counters" VALUES('AST',4);
 INSERT INTO "id_counters" VALUES('GNR',4);
