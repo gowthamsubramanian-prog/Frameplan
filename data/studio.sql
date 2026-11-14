@@ -1139,7 +1139,7 @@ CREATE TABLE projects (
   created_at   TEXT NOT NULL,
   updated_at   TEXT NOT NULL
 );
-INSERT INTO "projects" VALUES('PRJ-0001','Candle portrait shoot','B','production_plan','active','Candle-themed portrait shoot from two saved references (REF-000001, REF-000002). Owner decision 13 Nov 2026: use REAL candles, not LED with composited flames. Plan the prop, hair styling and safety measures around live flame. No source links or creators beyond the Cap2red Studio watermark on REF-000001.',NULL,10.0,'2026-11-13T20:57:42Z','2026-11-14T09:12:33Z');
+INSERT INTO "projects" VALUES('PRJ-0001','Candle portrait shoot','B','production_plan','paused','Candle-themed portrait shoot from two saved references (REF-000001, REF-000002). Owner decision 13 Nov 2026: use REAL candles, not LED with composited flames. Plan the prop, hair styling and safety measures around live flame. No source links or creators beyond the Cap2red Studio watermark on REF-000001.',NULL,10.0,'2026-11-13T20:57:42Z','2026-11-14T09:31:25Z');
 INSERT INTO "projects" VALUES('PRJ-0002','Why forklift and pedestrian segregation matters','E','proposal','cancelled','Motion Director test run 1 (skill default path: WHS/HSE, LinkedIn, 9:16). Title chosen by Claude from the skill''s own example; owner may substitute.',NULL,10.0,'2026-11-13T21:05:54Z','2026-11-13T21:10:33Z');
 CREATE TABLE prompts (
   id         TEXT PRIMARY KEY,                 -- PRM-0001
@@ -1259,6 +1259,7 @@ INSERT INTO "stage_history" VALUES(8,'PRJ-0001','technique_extraction','adaptati
 INSERT INTO "stage_history" VALUES(9,'PRJ-0001','adaptation','storyboard','concept A approved (APR-0003); style 1 blended with 2 approved (APR-0004)','2026-11-13T21:41:18Z');
 INSERT INTO "stage_history" VALUES(10,'PRJ-0001','storyboard','shot_list','storyboard v1 drafted','2026-11-14T09:04:02Z');
 INSERT INTO "stage_history" VALUES(11,'PRJ-0001','shot_list','production_plan','shot list v2 fitted to the owner''s kit','2026-11-14T09:12:33Z');
+INSERT INTO "stage_history" VALUES(12,'PRJ-0001','production_plan','production_plan','status -> paused: Parked by the owner on 14 Nov 2026; resume at production_plan (plan v2, DOC-0012)','2026-11-14T09:31:25Z');
 CREATE TABLE technique_shots (
   technique_id      TEXT NOT NULL REFERENCES shot_manifest(id),
   reference_shot_id TEXT NOT NULL REFERENCES reference_shots(id),
